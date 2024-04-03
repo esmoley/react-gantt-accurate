@@ -52,7 +52,7 @@ export function createFormattedDateFromDate(date:Date) {
 
 export function calcDayCompletion(date:Date){
   const dateStart = new Date(date)
-  dateStart.setUTCHours(0,0,0,0)
+  dateStart.setHours(0,0,0,0)
   const dayDiff = (date.getTime() - dateStart.getTime())
   return dayDiff / DaySize
 }

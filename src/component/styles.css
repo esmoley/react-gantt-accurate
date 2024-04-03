@@ -103,10 +103,6 @@
     outline: none;
     background: none;
   }
-
-  #gantt-grid-container__tasks{
-    margin-top: 120px;
-  }
   #gantt-grid-container__tasks button {
     color: #ef5350;
     background: none;
@@ -235,5 +231,15 @@
 
   .tooltip:hover .tooltiptext {
     visibility: visible;
+  }
+  .days-row{
+    text-anchor: middle;
+    fill: #333;
+  }
+  .cell-line{
+    stroke: #dce4e7;
+  }
+  .task-rect{
+    fill:#91bbfe;
   }
 }
