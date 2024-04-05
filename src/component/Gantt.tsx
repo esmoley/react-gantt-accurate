@@ -1,6 +1,6 @@
 import React from 'react'
 import './styles.css'
-import { calcDayCompletion, dayDiff, getDayOfWeek, getDaysInMonth, monthDiff } from '../util/ganttUtils'
+import { getDayOfWeek, getDaysInMonth, monthDiff } from '../util/ganttUtils'
 import { Locale } from '../util/types'
 type Task = {
   id: string
@@ -80,37 +80,58 @@ export const Gantt = ({ tasks, locale }: GanntProps) => {
     }
     return <g>{res}</g>
   }
-  const Dependencies = () => {
-    return tasks.map(
-      (task) =>
-        task.dependencies && (
-          <line
-            key={task.id}
-            x1='0'
-            y1='0'
-            x2='200'
-            y2='200'
-            style={{ fill: 'none', stroke: 'grey', strokeWidth: '1px' }}
-          ></line>
-        ),
-    )
+  const Dependencies = ({ y }: { y: number }) => {
+    return tasks.map((task, taskIndex) => {
+      if (!task.dependencies) return null
+      return tasks.map((depTask, depTaskIndex) => {
+        if (!task.dependencies.includes(depTask.id)) return null
+        const taskStartX = ((task.start.getTime() - startMonth.getTime()) / dayMs) * cellWidth
+        const taskY = y + taskIndex * cellHeight + cellHeight / 2
+
+        const depEndX =
+          ((depTask.start.getTime() - startMonth.getTime() + depTask.end.getTime() - depTask.start.getTime()) / dayMs) *
+          cellWidth
+        const depY = y + depTaskIndex * cellHeight + cellHeight / 2
+        const isTaskHigher = taskIndex < depTaskIndex
+        const h2 = taskStartX - depEndX - 20
+        const v1Text = `v ${isTaskHigher ? '-' : ''}${cellHeight / 2}`
+        const h2Text = `h ${taskStartX - depEndX - 20}`
+        return (
+          <g key={task.id}>
+            <path
+              stroke='grey'
+              fill='none'
+              strokeWidth={1.5}
+              d={`M ${depEndX} ${depY} 
+							h 10
+							${h2 > 0 ? h2Text + v1Text : v1Text + h2Text}
+							v ${cellHeight * (taskIndex - depTaskIndex) + ((isTaskHigher ? 1 : -1) * cellHeight) / 2}
+							h 10 `}
+            />
+            <polygon
+              fill='grey'
+              points={`${taskStartX},${taskY}
+								${taskStartX - 5},${taskY - 5}
+								${taskStartX - 5},${taskY + 5}`}
+            />
+          </g>
+        )
+      })
+    })
   }
   const TaskRowsTimePeriods = ({ y }: { y: number }) => {
     return (
       <g>
         {tasks.map((task, taskIndex) => {
-          const taskFromGridStartMs = task.start.getTime() - startMonth.getTime()
-          const days = dayDiff(task.start, task.end)
-          const dayComplStart = calcDayCompletion(task.start)
-          const dayComplStartWidth = cellWidth * dayComplStart
-          const dayComplEnd = calcDayCompletion(task.end)
+          const x = ((task.start.getTime() - startMonth.getTime()) / dayMs) * cellWidth
+          const width = ((task.end.getTime() - task.start.getTime()) / dayMs) * cellWidth
           return (
             <rect
               key={`${task.id}`}
               className='task-rect'
-              x={(taskFromGridStartMs / dayMs) * cellWidth + dayComplStartWidth}
+              x={x}
               y={y + taskIndex * cellHeight + 7}
-              width={(days - 2 + (1 - dayComplStart) + dayComplEnd) * cellWidth}
+              width={width}
               height={cellHeight - 14}
               ry={3}
               rx={3}
@@ -214,8 +235,8 @@ export const Gantt = ({ tasks, locale }: GanntProps) => {
             spaceX={cellWidth}
             height={timeGridHeight + cellHeight}
           />
+          <Dependencies y={cellHeight + 10} />
           <TaskRowsTimePeriods y={cellHeight + 10} />
-          <Dependencies />
         </svg>
       </div>
     )
