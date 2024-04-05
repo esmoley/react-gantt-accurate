@@ -1,4 +1,4 @@
-# Recharts Gantt Accurate
+# React Gantt Accurate
 
 ## License
 

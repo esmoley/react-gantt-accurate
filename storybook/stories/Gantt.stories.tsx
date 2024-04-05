@@ -48,7 +48,7 @@ export const GanttExample = {
         end: new Date('2023-04-24 19:06:18'),
       },
     ]
-    return <Gantt tasks={tasks} locale='ru' />
+    return <Gantt tasks={tasks} locale='ru' theme='dark' />
   },
   args: {},
   argTypes: {},

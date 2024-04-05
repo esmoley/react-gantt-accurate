@@ -1,7 +1,7 @@
 import React from 'react'
-import './styles.css'
 import { getDayOfWeek, getDaysInMonth, monthDiff } from '../util/ganttUtils'
 import { Locale } from '../util/types'
+import './styles.css'
 type Task = {
   id: string
   name: string
@@ -12,13 +12,15 @@ type Task = {
 type GanntProps = {
   tasks: Task[]
   locale?: Locale
+  theme?: 'light' | 'dark'
 }
 const cellWidth = 30
 const cellHeight = 40
 const leftPadding = 15
 const dayMs = new Date(0).setDate(2)
 
-export const Gantt = ({ tasks, locale }: GanntProps) => {
+export const Gantt = ({ tasks, locale, theme }: GanntProps) => {
+  if (!theme) theme = 'light'
   if (!locale) locale = 'en'
   const startMonth = new Date(
     new Date(
@@ -242,8 +244,8 @@ export const Gantt = ({ tasks, locale }: GanntProps) => {
     )
   }
   return (
-    <div id='gantt-container' className='react-gantt-accurate'>
-      <div id='gantt-grid-container'>
+    <div id='gantt-container' className={`react-gantt-accurate ${theme}`}>
+      <div className='gantt-grid-container'>
         <div id='gantt-grid-container__tasks' style={{ marginTop: `${cellHeight + 10}px` }}>
           {tasks.map((task) => (
             <div key={task.id}>
