@@ -1,6 +1,6 @@
 {
   "name": "react-gantt-accurate",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "main": "./lib/cjs/index.js",
   "module": "./lib/esm/index.js",
   "types": "./lib/esm/index.d.ts",
@@ -63,7 +63,6 @@
     "@storybook/react-vite": "^7.0.26",
     "@storybook/testing-library": "^0.0.14-next.2",
     "@types/react": "^18.2.14",
-    "@types/recharts": "^1.8.24",
     "@typescript-eslint/eslint-plugin": "^5.61.0",
     "@typescript-eslint/parser": "^5.61.0",
     "copyfiles": "^2.4.1",
