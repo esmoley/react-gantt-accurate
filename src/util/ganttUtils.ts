@@ -18,9 +18,9 @@ export function dayDiff(startDate: Date, endDate: Date) {
 export function getDaysInMonth(year: number, month: number) {
   return new Date(year, month, 0).getDate()
 }
-export function getDayOfWeek(year: number, month: number, day: number, locale: Locale = 'en') {
+export function getDayOfWeek(day: Date, locale: Locale = 'en') {
   const daysOfTheWeekArr = locale === 'en' ? DaysOfWeekArrEn : DaysOfWeekArrRu
-  const dayOfTheWeekIndex = new Date(year, month, day).getDay()
+  const dayOfTheWeekIndex = day.getDay()
   return daysOfTheWeekArr[dayOfTheWeekIndex]
 }
 

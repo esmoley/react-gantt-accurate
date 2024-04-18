@@ -1,5 +1,5 @@
 import React from 'react'
-import { getDayOfWeek, getDaysInMonth, monthDiff } from '../util/ganttUtils'
+import { getDayOfWeek } from '../util/ganttUtils'
 import { Locale } from '../util/types'
 import './styles.css'
 type TaskDate = Date | number
@@ -15,7 +15,7 @@ type GanntProps = {
   tasks: Task[]
   locale?: Locale
   theme?: 'light' | 'dark'
-  //scale?: 'month'
+  scale?: 'days' | 'hours'
 }
 type TaskGraph = {
   index: number
@@ -32,14 +32,12 @@ type TaskGraph = {
 const cellWidth = 30
 const cellHeight = 40
 const leftPadding = 15
-const dayMs = new Date(0).setDate(2)
+const hourMs = 60 * 60 * 1000
+const dayMs = 24 * 60 * 60 * 1000 // hours*minutes*seconds*milliseconds
 
-export const Gantt = ({ tasks, locale, theme }: GanntProps) => {
-  if (!theme) theme = 'light'
-  if (!locale) locale = 'en'
+export const Gantt = ({ tasks, locale = 'en', theme = 'light', scale = 'days' }: GanntProps) => {
+  const cellMs = scale == 'hours' ? hourMs : dayMs
 
-  //if (!scale) scale = 'month'
-  //const scale = 'month'
   const taskGraphMap: Map<string, TaskGraph> = tasks.reduce((acc, task, index) => {
     return acc.set(task.id, {
       index,
@@ -64,53 +62,41 @@ export const Gantt = ({ tasks, locale, theme }: GanntProps) => {
     (acc, task) => (task.end > acc.end ? task : acc),
     taskGraphArr[0],
   )
+  const lowestTaskStartDate = new Date(lowestTaskGraphStart.start)
+  const startDate = new Date(lowestTaskStartDate.getFullYear(), lowestTaskStartDate.getMonth(), 1, 0, 0, 0, 0)
+  const highestTaskEndDate = new Date(highestTaskGraphEnd.end)
+  const endDate = new Date(
+    new Date(highestTaskEndDate.getFullYear(), highestTaskEndDate.getMonth() + 1, 1, 0, 0, 0, 0).getTime() - 0.001,
+  )
 
-  const startMonth = new Date(new Date(lowestTaskGraphStart.start).setDate(1))
-  const endMonth = new Date(highestTaskGraphEnd.end)
-
-  const monthsAmount = monthDiff(startMonth, endMonth) + 1
   const DaysRow = ({ y }: { y: number }) => {
-    const month = new Date(startMonth)
+    const day = new Date(startDate)
     const res = []
     let curX = leftPadding
-    for (let i = 0; i < monthsAmount; i++) {
-      // add days as children
-      const numDays = getDaysInMonth(month.getFullYear(), month.getMonth() + 1)
-      const days = []
-      for (let j = i === 0 ? startMonth.getDate() : 1; j <= numDays; j++) {
-        days.push(
-          <text key={j} y={y} x={curX} className='days-row'>
-            {j}
-          </text>,
-        )
-        curX += cellWidth
-      }
-      res.push(days)
-      month.setMonth(month.getMonth() + 1)
+    while (day.getTime() < endDate.getTime()) {
+      res.push(
+        <text key={day.valueOf()} y={y} x={curX} className='days-row'>
+          {day.getDate()}
+        </text>,
+      )
+      curX += (dayMs / cellMs) * cellWidth
+      day.setDate(day.getDate() + 1)
     }
     return <g>{res}</g>
   }
   const DaysOfTheWeekRow = ({ y }: { y: number }) => {
-    const month = new Date(startMonth)
+    const day = new Date(startDate)
     const res = []
     let curX = leftPadding
-    for (let i = 0; i < monthsAmount; i++) {
-      // add days of the week as children
-      const currYear = month.getFullYear()
-      const currMonth = month.getMonth() + 1
-      const numDays = getDaysInMonth(currYear, currMonth)
-      const daysInMonthEls = []
-      for (let j = i === 0 ? startMonth.getDate() : 1; j <= numDays; j++) {
-        const dayOfTheWeek = getDayOfWeek(currYear, currMonth - 1, j - 1, locale)
-        daysInMonthEls.push(
-          <text key={j} y={y} x={curX} className='days-row'>
-            {dayOfTheWeek}
-          </text>,
-        )
-        curX += cellWidth
-      }
-      res.push(daysInMonthEls)
-      month.setMonth(month.getMonth() + 1)
+    while (day.getTime() < endDate.getTime()) {
+      const dayOfTheWeek = getDayOfWeek(day, locale)
+      res.push(
+        <text key={day.valueOf()} y={y} x={curX} className='days-row'>
+          {dayOfTheWeek}
+        </text>,
+      )
+      curX += (dayMs / cellMs) * cellWidth
+      day.setDate(day.getDate() + 1)
     }
     return <g>{res}</g>
   }
@@ -118,10 +104,10 @@ export const Gantt = ({ tasks, locale, theme }: GanntProps) => {
     return taskGraphArr.map((t) => {
       if (t.dependencies.length === 0) return null
       return t.dependencies.map((tD) => {
-        const taskStartX = ((t.start - startMonth.getTime()) / dayMs) * cellWidth
+        const taskStartX = ((t.start - startDate.getTime()) / cellMs) * cellWidth
         const taskY = y + t.index * cellHeight + cellHeight / 2
 
-        const depEndX = ((tD.start - startMonth.getTime() + tD.end - tD.start) / dayMs) * cellWidth
+        const depEndX = ((tD.start - startDate.getTime() + tD.end - tD.start) / cellMs) * cellWidth
         const depY = y + tD.index * cellHeight + cellHeight / 2
         const isTaskHigher = t.index < tD.index
         const h2 = taskStartX - depEndX - 20
@@ -154,8 +140,8 @@ export const Gantt = ({ tasks, locale, theme }: GanntProps) => {
     return (
       <g>
         {taskGraphArr.map((t, taskIndex) => {
-          const x = ((t.start - startMonth.getTime()) / dayMs) * cellWidth
-          const width = ((t.end - t.start) / dayMs) * cellWidth
+          const x = ((t.start - startDate.getTime()) / cellMs) * cellWidth
+          const width = ((t.end - t.start) / cellMs) * cellWidth
           return (
             <rect
               key={`${t.task.id}`}
@@ -200,45 +186,29 @@ export const Gantt = ({ tasks, locale, theme }: GanntProps) => {
   }
   const Cells = ({ y }: { y: number }) => {
     const res = []
-    const month = new Date(startMonth)
+    let currentCellMs = startDate.getTime()
     let curX = 0
-    const renderDay = (day: number, curX: number, currYear: number, currMonth: number) => {
-      const dayOfTheWeek = getDayOfWeek(currYear, currMonth - 1, day)
-      return (
-        <rect
-          key={`${currMonth}_${day}_${currYear}`}
-          x={curX}
-          y={y}
-          width={cellWidth}
-          height={cellHeight * tasks.length}
-          fill={dayOfTheWeek === 'S' ? '#f5f5f5' : '#fff'}
-        />
-      )
-    }
-    for (let i = 0; i < monthsAmount; i++) {
-      const currYear = month.getFullYear()
-      const currMonth = month.getMonth() + 1
-      const numDays = getDaysInMonth(currYear, currMonth)
-      for (let j = i === 0 ? startMonth.getDate() - 1 : 0; j < numDays; j++) {
-        res.push(renderDay(j, curX, currYear, currMonth))
-        curX += cellWidth
-      }
-      month.setMonth(month.getMonth() + 1)
-    }
+    let cellIndex = 0
 
-    res.push(renderDay(1, curX, month.getFullYear(), month.getMonth() + 1))
-    curX += cellWidth
+    while (currentCellMs < endDate.getTime() + cellMs) {
+      const fill =
+        scale === 'days' && getDayOfWeek(new Date(currentCellMs)) === 'S'
+          ? '#f5f5f5'
+          : scale === 'hours' && cellIndex % 2 === 1
+          ? '#f5f5f5'
+          : '#fff'
+      res.push(
+        <rect key={currentCellMs} x={curX} y={y} width={cellWidth} height={cellHeight * tasks.length} fill={fill} />,
+      )
+      cellIndex++
+      curX += cellWidth
+      currentCellMs += cellMs
+    }
     return <g>{res}</g>
   }
   const TimeGrid = () => {
-    const month = new Date(startMonth)
-    let totalDays = 0
-    for (let i = 0; i < monthsAmount; i++) {
-      const numDays = getDaysInMonth(month.getFullYear(), month.getMonth() + 1)
-      totalDays += i === 0 ? numDays - startMonth.getDate() + 1 : numDays
-      month.setMonth(month.getMonth() + 1)
-    }
-    const timeLineWidth = cellWidth * totalDays
+    const columnsCount = (endDate.getTime() - startDate.getTime()) / cellMs
+    const timeLineWidth = cellWidth * columnsCount
     const timeGridHeight = cellHeight * tasks.length + 10
     return (
       <div style={{ overflowX: 'scroll' }}>
@@ -255,7 +225,7 @@ export const Gantt = ({ tasks, locale, theme }: GanntProps) => {
           <ColumnLines
             x={0}
             y={cellHeight + 10}
-            amount={totalDays + 1}
+            amount={columnsCount + 1}
             spaceX={cellWidth}
             height={timeGridHeight + cellHeight}
           />
