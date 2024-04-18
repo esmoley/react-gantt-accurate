@@ -63,11 +63,36 @@ export const Gantt = ({ tasks, locale = 'en', theme = 'light', scale = 'days' }:
     taskGraphArr[0],
   )
   const lowestTaskStartDate = new Date(lowestTaskGraphStart.start)
-  const startDate = new Date(lowestTaskStartDate.getFullYear(), lowestTaskStartDate.getMonth(), 1, 0, 0, 0, 0)
+  const startDate =
+    scale === 'hours'
+      ? new Date(
+          lowestTaskStartDate.getFullYear(),
+          lowestTaskStartDate.getMonth(),
+          lowestTaskStartDate.getDate(),
+          0,
+          0,
+          0,
+          0,
+        )
+      : new Date(lowestTaskStartDate.getFullYear(), lowestTaskStartDate.getMonth(), 1, 0, 0, 0, 0)
   const highestTaskEndDate = new Date(highestTaskGraphEnd.end)
-  const endDate = new Date(
-    new Date(highestTaskEndDate.getFullYear(), highestTaskEndDate.getMonth() + 1, 1, 0, 0, 0, 0).getTime() - 0.001,
-  )
+  const endDate =
+    scale === 'hours'
+      ? new Date(
+          new Date(
+            highestTaskEndDate.getFullYear(),
+            highestTaskEndDate.getMonth(),
+            highestTaskEndDate.getDate() + 1,
+            0,
+            0,
+            0,
+            0,
+          ).getTime() - 0.001,
+        )
+      : new Date(
+          new Date(highestTaskEndDate.getFullYear(), highestTaskEndDate.getMonth() + 1, 1, 0, 0, 0, 0).getTime() -
+            0.001,
+        )
 
   const DaysRow = ({ y }: { y: number }) => {
     const day = new Date(startDate)
@@ -97,6 +122,21 @@ export const Gantt = ({ tasks, locale = 'en', theme = 'light', scale = 'days' }:
       )
       curX += (dayMs / cellMs) * cellWidth
       day.setDate(day.getDate() + 1)
+    }
+    return <g>{res}</g>
+  }
+  const HoursRow = ({ y }: { y: number }) => {
+    const hour = new Date(startDate)
+    const res = []
+    let curX = leftPadding
+    while (hour.getTime() < endDate.getTime()) {
+      res.push(
+        <text key={hour.valueOf()} y={y} x={curX} className='days-row'>
+          {hour.getHours()}
+        </text>,
+      )
+      curX += (hourMs / cellMs) * cellWidth
+      hour.setHours(hour.getHours() + 1)
     }
     return <g>{res}</g>
   }
@@ -188,19 +228,17 @@ export const Gantt = ({ tasks, locale = 'en', theme = 'light', scale = 'days' }:
     const res = []
     let currentCellMs = startDate.getTime()
     let curX = 0
-    let cellIndex = 0
-
     while (currentCellMs < endDate.getTime() + cellMs) {
+      const currentDate = new Date(currentCellMs)
       const fill =
-        scale === 'days' && getDayOfWeek(new Date(currentCellMs)) === 'S'
+        scale === 'days' && getDayOfWeek(currentDate) === 'S'
           ? '#f5f5f5'
-          : scale === 'hours' && cellIndex % 2 === 1
+          : scale === 'hours' && currentDate.getHours() >= 12
           ? '#f5f5f5'
           : '#fff'
       res.push(
         <rect key={currentCellMs} x={curX} y={y} width={cellWidth} height={cellHeight * tasks.length} fill={fill} />,
       )
-      cellIndex++
       curX += cellWidth
       currentCellMs += cellMs
     }
@@ -214,7 +252,7 @@ export const Gantt = ({ tasks, locale = 'en', theme = 'light', scale = 'days' }:
       <div style={{ overflowX: 'scroll' }}>
         <svg width={timeLineWidth + leftPadding / 2} height={timeGridHeight + cellHeight}>
           <DaysRow y={cellHeight / 2} />
-          <DaysOfTheWeekRow y={cellHeight} />
+          {scale === 'days' ? <DaysOfTheWeekRow y={cellHeight} /> : scale === 'hours' && <HoursRow y={cellHeight} />}
           <Cells y={cellHeight + 10} />
           <RowLines
             y={cellHeight + 10}
