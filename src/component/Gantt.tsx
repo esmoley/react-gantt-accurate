@@ -15,7 +15,7 @@ type GanntProps = {
   tasks: Task[]
   locale?: Locale
   theme?: 'light' | 'dark'
-  scale?: 'days' | 'hours'
+  scale?: 'days' | 'hours' | 'minutes'
 }
 type TaskGraph = {
   index: number
@@ -32,11 +32,12 @@ type TaskGraph = {
 const cellWidth = 30
 const cellHeight = 40
 const leftPadding = 15
+const minuteMs = 60 * 1000
 const hourMs = 60 * 60 * 1000
 const dayMs = 24 * 60 * 60 * 1000 // hours*minutes*seconds*milliseconds
 
 export const Gantt = ({ tasks, locale = 'en', theme = 'light', scale = 'days' }: GanntProps) => {
-  const cellMs = scale == 'hours' ? hourMs : dayMs
+  const cellMs = scale == 'hours' ? hourMs : scale == 'minutes' ? minuteMs : dayMs
 
   const taskGraphMap: Map<string, TaskGraph> = tasks.reduce((acc, task, index) => {
     return acc.set(task.id, {
@@ -74,6 +75,16 @@ export const Gantt = ({ tasks, locale = 'en', theme = 'light', scale = 'days' }:
           0,
           0,
         )
+      : scale === 'minutes'
+      ? new Date(
+          lowestTaskStartDate.getFullYear(),
+          lowestTaskStartDate.getMonth(),
+          lowestTaskStartDate.getDate(),
+          lowestTaskStartDate.getHours(),
+          0,
+          0,
+          0,
+        )
       : new Date(lowestTaskStartDate.getFullYear(), lowestTaskStartDate.getMonth(), 1, 0, 0, 0, 0)
   const highestTaskEndDate = new Date(highestTaskGraphEnd.end)
   const endDate =
@@ -84,6 +95,18 @@ export const Gantt = ({ tasks, locale = 'en', theme = 'light', scale = 'days' }:
             highestTaskEndDate.getMonth(),
             highestTaskEndDate.getDate() + 1,
             0,
+            0,
+            0,
+            0,
+          ).getTime() - 0.001,
+        )
+      : scale === 'minutes'
+      ? new Date(
+          new Date(
+            highestTaskEndDate.getFullYear(),
+            highestTaskEndDate.getMonth(),
+            highestTaskEndDate.getDate(),
+            highestTaskEndDate.getHours() + 1,
             0,
             0,
             0,
@@ -137,6 +160,21 @@ export const Gantt = ({ tasks, locale = 'en', theme = 'light', scale = 'days' }:
       )
       curX += (hourMs / cellMs) * cellWidth
       hour.setHours(hour.getHours() + 1)
+    }
+    return <g>{res}</g>
+  }
+  const MinutesRow = ({ y }: { y: number }) => {
+    const minute = new Date(startDate)
+    const res = []
+    let curX = leftPadding
+    while (minute.getTime() < endDate.getTime()) {
+      res.push(
+        <text key={minute.valueOf()} y={y} x={curX} className='days-row'>
+          {minute.getMinutes()}
+        </text>,
+      )
+      curX += (minuteMs / cellMs) * cellWidth
+      minute.setMinutes(minute.getMinutes() + 1)
     }
     return <g>{res}</g>
   }
@@ -251,8 +289,24 @@ export const Gantt = ({ tasks, locale = 'en', theme = 'light', scale = 'days' }:
     return (
       <div style={{ overflowX: 'scroll' }}>
         <svg width={timeLineWidth + leftPadding / 2} height={timeGridHeight + cellHeight}>
-          <DaysRow y={cellHeight / 2} />
-          {scale === 'days' ? <DaysOfTheWeekRow y={cellHeight} /> : scale === 'hours' && <HoursRow y={cellHeight} />}
+          {scale === 'days' && (
+            <>
+              <DaysRow y={cellHeight / 2} />
+              <DaysOfTheWeekRow y={cellHeight} />
+            </>
+          )}
+          {scale === 'hours' && (
+            <>
+              <DaysRow y={cellHeight / 2} />
+              <HoursRow y={cellHeight} />
+            </>
+          )}
+          {scale === 'minutes' && (
+            <>
+              <HoursRow y={cellHeight / 2} />
+              <MinutesRow y={cellHeight} />
+            </>
+          )}
           <Cells y={cellHeight + 10} />
           <RowLines
             y={cellHeight + 10}
