@@ -15,7 +15,7 @@ type GanntProps = {
   tasks: Task[]
   locale?: Locale
   theme?: 'light' | 'dark'
-  scale?: 'days' | 'hours' | 'minutes'
+  viewMode?: 'days' | 'hours' | 'minutes' | 'seconds' | 'milliseconds'
 }
 type TaskGraph = {
   index: number
@@ -24,20 +24,27 @@ type TaskGraph = {
   end: number
 
   dependencies: TaskGraph[]
-
-  x?: number
-  y?: number
-  width?: number
 }
 const cellWidth = 30
 const cellHeight = 40
 const leftPadding = 15
+const millisecondMs = 1
+const secondMs = 1000
 const minuteMs = 60 * 1000
 const hourMs = 60 * 60 * 1000
 const dayMs = 24 * 60 * 60 * 1000 // hours*minutes*seconds*milliseconds
 
-export const Gantt = ({ tasks, locale = 'en', theme = 'light', scale = 'days' }: GanntProps) => {
-  const cellMs = scale == 'hours' ? hourMs : scale == 'minutes' ? minuteMs : dayMs
+export const Gantt = ({ tasks, locale = 'en', theme = 'light', viewMode = 'days' }: GanntProps) => {
+  const cellMs =
+    viewMode === 'hours'
+      ? hourMs
+      : viewMode === 'minutes'
+      ? minuteMs
+      : viewMode === 'seconds'
+      ? secondMs
+      : viewMode === 'milliseconds'
+      ? millisecondMs
+      : dayMs
 
   const taskGraphMap: Map<string, TaskGraph> = tasks.reduce((acc, task, index) => {
     return acc.set(task.id, {
@@ -65,62 +72,117 @@ export const Gantt = ({ tasks, locale = 'en', theme = 'light', scale = 'days' }:
   )
   const lowestTaskStartDate = new Date(lowestTaskGraphStart.start)
   const startDate =
-    scale === 'hours'
+    viewMode === 'hours'
       ? new Date(
           lowestTaskStartDate.getFullYear(),
           lowestTaskStartDate.getMonth(),
           lowestTaskStartDate.getDate(),
-          0,
+          lowestTaskStartDate.getHours() - 1,
           0,
           0,
           0,
         )
-      : scale === 'minutes'
+      : viewMode === 'minutes'
       ? new Date(
           lowestTaskStartDate.getFullYear(),
           lowestTaskStartDate.getMonth(),
           lowestTaskStartDate.getDate(),
           lowestTaskStartDate.getHours(),
+          lowestTaskStartDate.getMinutes() - 1,
+          0,
+          0,
+        )
+      : viewMode === 'seconds'
+      ? new Date(
+          lowestTaskStartDate.getFullYear(),
+          lowestTaskStartDate.getMonth(),
+          lowestTaskStartDate.getDate(),
+          lowestTaskStartDate.getHours(),
+          lowestTaskStartDate.getMinutes(),
+          lowestTaskStartDate.getSeconds() - 1,
+          0,
+        )
+      : viewMode === 'milliseconds'
+      ? new Date(
+          lowestTaskStartDate.getFullYear(),
+          lowestTaskStartDate.getMonth(),
+          lowestTaskStartDate.getDate(),
+          lowestTaskStartDate.getHours(),
+          lowestTaskStartDate.getMinutes(),
+          lowestTaskStartDate.getSeconds(),
+          lowestTaskStartDate.getMilliseconds() - 1,
+        )
+      : new Date(
+          lowestTaskStartDate.getFullYear(),
+          lowestTaskStartDate.getMonth(),
+          lowestTaskStartDate.getDate() === 1 ? 0 : 1,
+          0,
           0,
           0,
           0,
         )
-      : new Date(lowestTaskStartDate.getFullYear(), lowestTaskStartDate.getMonth(), 1, 0, 0, 0, 0)
   const highestTaskEndDate = new Date(highestTaskGraphEnd.end)
   const endDate =
-    scale === 'hours'
-      ? new Date(
-          new Date(
-            highestTaskEndDate.getFullYear(),
-            highestTaskEndDate.getMonth(),
-            highestTaskEndDate.getDate() + 1,
-            0,
-            0,
-            0,
-            0,
-          ).getTime() - 0.001,
-        )
-      : scale === 'minutes'
+    viewMode === 'hours'
       ? new Date(
           new Date(
             highestTaskEndDate.getFullYear(),
             highestTaskEndDate.getMonth(),
             highestTaskEndDate.getDate(),
-            highestTaskEndDate.getHours() + 1,
+            highestTaskEndDate.getHours() + 2,
             0,
             0,
             0,
           ).getTime() - 0.001,
         )
-      : new Date(
-          new Date(highestTaskEndDate.getFullYear(), highestTaskEndDate.getMonth() + 1, 1, 0, 0, 0, 0).getTime() -
-            0.001,
+      : viewMode === 'minutes'
+      ? new Date(
+          new Date(
+            highestTaskEndDate.getFullYear(),
+            highestTaskEndDate.getMonth(),
+            highestTaskEndDate.getDate(),
+            highestTaskEndDate.getHours(),
+            highestTaskEndDate.getMinutes() + 2,
+            0,
+            0,
+          ).getTime() - 0.001,
         )
+      : viewMode === 'seconds'
+      ? new Date(
+          new Date(
+            highestTaskEndDate.getFullYear(),
+            highestTaskEndDate.getMonth(),
+            highestTaskEndDate.getDate(),
+            highestTaskEndDate.getHours(),
+            highestTaskEndDate.getMinutes(),
+            highestTaskEndDate.getSeconds() + 2,
+            0,
+          ).getTime() - 0.001,
+        )
+      : viewMode === 'milliseconds'
+      ? new Date(
+          new Date(
+            highestTaskEndDate.getFullYear(),
+            highestTaskEndDate.getMonth(),
+            highestTaskEndDate.getDate(),
+            highestTaskEndDate.getHours(),
+            highestTaskEndDate.getMinutes(),
+            highestTaskEndDate.getSeconds(),
+            highestTaskEndDate.getMilliseconds() + 2,
+          ).getTime() - 0.001,
+        )
+      : new Date(highestTaskEndDate.getFullYear(), highestTaskEndDate.getMonth() + 1, 1, 0, 0, 0, 0)
 
   const DaysRow = ({ y }: { y: number }) => {
-    const day = new Date(startDate)
     const res = []
+    const day = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 0, 0, 0, 0)
     let curX = leftPadding
+
+    const dayDiff = startDate.getTime() - day.getTime()
+    if (dayDiff > 0) {
+      curX += ((dayMs - dayDiff) / cellMs) * cellWidth
+      day.setDate(day.getDate() + 1)
+    }
     while (day.getTime() < endDate.getTime()) {
       res.push(
         <text key={day.valueOf()} y={y} x={curX} className='days-row'>
@@ -133,9 +195,15 @@ export const Gantt = ({ tasks, locale = 'en', theme = 'light', scale = 'days' }:
     return <g>{res}</g>
   }
   const DaysOfTheWeekRow = ({ y }: { y: number }) => {
-    const day = new Date(startDate)
     const res = []
+    const day = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 0, 0, 0, 0)
     let curX = leftPadding
+
+    const dayDiff = startDate.getTime() - day.getTime()
+    if (dayDiff > 0) {
+      curX += ((dayMs - dayDiff) / cellMs) * cellWidth
+      day.setDate(day.getDate() + 1)
+    }
     while (day.getTime() < endDate.getTime()) {
       const dayOfTheWeek = getDayOfWeek(day, locale)
       res.push(
@@ -149,9 +217,24 @@ export const Gantt = ({ tasks, locale = 'en', theme = 'light', scale = 'days' }:
     return <g>{res}</g>
   }
   const HoursRow = ({ y }: { y: number }) => {
-    const hour = new Date(startDate)
     const res = []
+    const hour = new Date(
+      startDate.getFullYear(),
+      startDate.getMonth(),
+      startDate.getDate(),
+      startDate.getHours(),
+      0,
+      0,
+      0,
+    )
     let curX = leftPadding
+
+    const hoursDiff = startDate.getTime() - hour.getTime()
+    if (hoursDiff > 0) {
+      curX += ((hourMs - hoursDiff) / cellMs) * cellWidth
+      hour.setHours(hour.getHours() + 1)
+    }
+
     while (hour.getTime() < endDate.getTime()) {
       res.push(
         <text key={hour.valueOf()} y={y} x={curX} className='days-row'>
@@ -164,9 +247,23 @@ export const Gantt = ({ tasks, locale = 'en', theme = 'light', scale = 'days' }:
     return <g>{res}</g>
   }
   const MinutesRow = ({ y }: { y: number }) => {
-    const minute = new Date(startDate)
     const res = []
+    const minute = new Date(
+      startDate.getFullYear(),
+      startDate.getMonth(),
+      startDate.getDate(),
+      startDate.getHours(),
+      startDate.getMinutes(),
+      0,
+      0,
+    )
     let curX = leftPadding
+
+    const minutesDiff = startDate.getTime() - minute.getTime()
+    if (minutesDiff > 0) {
+      curX += ((minuteMs - minutesDiff) / cellMs) * cellWidth
+      minute.setMinutes(minute.getMinutes() + 1)
+    }
     while (minute.getTime() < endDate.getTime()) {
       res.push(
         <text key={minute.valueOf()} y={y} x={curX} className='days-row'>
@@ -175,6 +272,50 @@ export const Gantt = ({ tasks, locale = 'en', theme = 'light', scale = 'days' }:
       )
       curX += (minuteMs / cellMs) * cellWidth
       minute.setMinutes(minute.getMinutes() + 1)
+    }
+    return <g>{res}</g>
+  }
+  const SecondsRow = ({ y }: { y: number }) => {
+    const res = []
+    const second = new Date(
+      startDate.getFullYear(),
+      startDate.getMonth(),
+      startDate.getDate(),
+      startDate.getHours(),
+      startDate.getMinutes(),
+      startDate.getSeconds(),
+      0,
+    )
+    let curX = leftPadding
+
+    const secondDiff = startDate.getTime() - second.getTime()
+    if (secondDiff > 0) {
+      curX += ((secondMs - secondDiff) / cellMs) * cellWidth
+      second.setSeconds(second.getSeconds() + 1)
+    }
+    while (second.getTime() < endDate.getTime()) {
+      res.push(
+        <text key={second.valueOf()} y={y} x={curX} className='days-row'>
+          {second.getSeconds()}
+        </text>,
+      )
+      curX += (secondMs / cellMs) * cellWidth
+      second.setSeconds(second.getSeconds() + 1)
+    }
+    return <g>{res}</g>
+  }
+  const MillisecondsRow = ({ y }: { y: number }) => {
+    const millisecond = new Date(startDate)
+    const res = []
+    let curX = leftPadding
+    while (millisecond.getTime() < endDate.getTime()) {
+      res.push(
+        <text key={millisecond.valueOf()} y={y} x={curX} className='days-row'>
+          {millisecond.getMilliseconds()}
+        </text>,
+      )
+      curX += (millisecondMs / cellMs) * cellWidth
+      millisecond.setMilliseconds(millisecond.getMilliseconds() + 1)
     }
     return <g>{res}</g>
   }
@@ -269,9 +410,9 @@ export const Gantt = ({ tasks, locale = 'en', theme = 'light', scale = 'days' }:
     while (currentCellMs < endDate.getTime() + cellMs) {
       const currentDate = new Date(currentCellMs)
       const fill =
-        scale === 'days' && getDayOfWeek(currentDate) === 'S'
+        viewMode === 'days' && getDayOfWeek(currentDate) === 'S'
           ? '#f5f5f5'
-          : scale === 'hours' && currentDate.getHours() >= 12
+          : viewMode === 'hours' && currentDate.getHours() >= 12
           ? '#f5f5f5'
           : '#fff'
       res.push(
@@ -289,22 +430,34 @@ export const Gantt = ({ tasks, locale = 'en', theme = 'light', scale = 'days' }:
     return (
       <div style={{ overflowX: 'scroll' }}>
         <svg width={timeLineWidth + leftPadding / 2} height={timeGridHeight + cellHeight}>
-          {scale === 'days' && (
+          {viewMode === 'days' && (
             <>
               <DaysRow y={cellHeight / 2} />
               <DaysOfTheWeekRow y={cellHeight} />
             </>
           )}
-          {scale === 'hours' && (
+          {viewMode === 'hours' && (
             <>
               <DaysRow y={cellHeight / 2} />
               <HoursRow y={cellHeight} />
             </>
           )}
-          {scale === 'minutes' && (
+          {viewMode === 'minutes' && (
             <>
               <HoursRow y={cellHeight / 2} />
               <MinutesRow y={cellHeight} />
+            </>
+          )}
+          {viewMode === 'seconds' && (
+            <>
+              <MinutesRow y={cellHeight / 2} />
+              <SecondsRow y={cellHeight} />
+            </>
+          )}
+          {viewMode === 'milliseconds' && (
+            <>
+              <SecondsRow y={cellHeight / 2} />
+              <MillisecondsRow y={cellHeight} />
             </>
           )}
           <Cells y={cellHeight + 10} />
