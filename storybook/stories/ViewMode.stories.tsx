@@ -48,7 +48,7 @@ export const Days = {
         end: new Date('2024-04-30 00:06:18'),
       },
     ]
-    return <Gantt tasks={tasks} locale='ru' theme='dark' />
+    return <Gantt tasks={tasks} />
   },
   args: {},
   argTypes: {},
@@ -94,7 +94,7 @@ export const Hours = {
         end: new Date('2024-04-24 19:06:18'),
       },
     ]
-    return <Gantt tasks={tasks} locale='ru' theme='dark' viewMode='hours' />
+    return <Gantt tasks={tasks} viewMode='hours' />
   },
   args: {},
   argTypes: {},
@@ -140,7 +140,7 @@ export const Minutes = {
         end: new Date('2024-04-20 19:16:18'),
       },
     ]
-    return <Gantt tasks={tasks} locale='ru' theme='dark' viewMode='minutes' />
+    return <Gantt tasks={tasks} viewMode='minutes' />
   },
   args: {},
   argTypes: {},
@@ -186,7 +186,7 @@ export const Seconds = {
         end: new Date('2024-04-20 19:06:22'),
       },
     ]
-    return <Gantt tasks={tasks} locale='ru' theme='dark' viewMode='seconds' />
+    return <Gantt tasks={tasks} viewMode='seconds' />
   },
   args: {},
   argTypes: {},
@@ -232,7 +232,7 @@ export const Milliseconds = {
         end: new Date('2024-04-20 19:06:10.106'),
       },
     ]
-    return <Gantt tasks={tasks} locale='ru' theme='dark' viewMode='milliseconds' />
+    return <Gantt tasks={tasks} viewMode='milliseconds' />
   },
   args: {},
   argTypes: {},
