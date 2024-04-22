@@ -5,19 +5,23 @@ import './styles.css'
 type TaskDate = Date | number
 type Task = {
   id: string
-  name: string
   start: TaskDate
   end: TaskDate
   dependencies?: string[]
 }
+type Row = {
+  name: string
+  tasks: Task[]
+}
 
 type GanntProps = {
-  tasks: Task[]
+  rows: Row[]
   locale?: Locale
   theme?: 'light' | 'dark'
   viewMode?: 'days' | 'hours' | 'minutes' | 'seconds' | 'milliseconds'
 }
 type TaskGraph = {
+  rowIndex: number
   index: number
   task: Task
   start: number
@@ -34,7 +38,7 @@ const minuteMs = 60 * 1000
 const hourMs = 60 * 60 * 1000
 const dayMs = 24 * 60 * 60 * 1000 // hours*minutes*seconds*milliseconds
 
-export const Gantt = ({ tasks, locale = 'en', theme = 'light', viewMode = 'days' }: GanntProps) => {
+export const Gantt = ({ rows, locale = 'en', theme = 'light', viewMode = 'days' }: GanntProps) => {
   const cellMs =
     viewMode === 'hours'
       ? hourMs
@@ -46,17 +50,21 @@ export const Gantt = ({ tasks, locale = 'en', theme = 'light', viewMode = 'days'
       ? millisecondMs
       : dayMs
 
-  const taskGraphMap: Map<string, TaskGraph> = tasks.reduce((acc, task, index) => {
-    return acc.set(task.id, {
-      index,
-      task: task,
-      start: task.start instanceof Date ? task.start.getTime() : task.start,
-      end: task.end instanceof Date ? task.end.getTime() : task.end,
-      dependencies: [],
-    })
+  const taskGraphMap: Map<string, TaskGraph> = rows.reduce((accRows, row, rowIndex) => {
+    return row.tasks.reduce((acc, task, index) => {
+      return acc.set(task.id, {
+        rowIndex,
+        index,
+        task: task,
+        start: task.start instanceof Date ? task.start.getTime() : task.start,
+        end: task.end instanceof Date ? task.end.getTime() : task.end,
+        dependencies: [],
+      })
+    }, accRows)
   }, new Map<string, TaskGraph>())
-  const taskGraphArr: TaskGraph[] = Array.from(taskGraphMap.values())
 
+  const taskGraphArr: TaskGraph[] = Array.from(taskGraphMap.values())
+  console.log({ taskGraphMap, taskGraphArr })
   //udpate deps
   taskGraphMap.forEach((t) =>
     t.task.dependencies?.forEach((tDepId) => taskGraphMap.has(tDepId) && t.dependencies.push(taskGraphMap.get(tDepId))),
@@ -324,31 +332,48 @@ export const Gantt = ({ tasks, locale = 'en', theme = 'light', viewMode = 'days'
       if (t.dependencies.length === 0) return null
       return t.dependencies.map((tD) => {
         const taskStartX = ((t.start - startDate.getTime()) / cellMs) * cellWidth
-        const taskY = y + t.index * cellHeight + cellHeight / 2
+        const taskEndX = ((t.start - startDate.getTime() + t.end - t.start) / cellMs) * cellWidth
+        const taskY = y + t.rowIndex * cellHeight + cellHeight / 2
 
+        const depStartX = ((tD.start - startDate.getTime()) / cellMs) * cellWidth
         const depEndX = ((tD.start - startDate.getTime() + tD.end - tD.start) / cellMs) * cellWidth
-        const depY = y + tD.index * cellHeight + cellHeight / 2
-        const isTaskHigher = t.index < tD.index
-        const h2 = taskStartX - depEndX - 20
-        const v1Text = `v ${isTaskHigher ? '-' : ''}${cellHeight / 2}`
-        const h2Text = `h ${taskStartX - depEndX - 20}`
+        const depY = y + tD.rowIndex * cellHeight + cellHeight / 2
+        const isTaskHigher = t.rowIndex < tD.rowIndex
+        const isSameRow = t.rowIndex === tD.rowIndex
+
         return (
           <g key={t.task.id}>
             <path
               stroke='grey'
               fill='none'
               strokeWidth={1.5}
-              d={`M ${depEndX} ${depY} 
-							h 10
-							${h2 > 0 ? h2Text + v1Text : v1Text + h2Text}
-							v ${cellHeight * (t.index - tD.index) + ((isTaskHigher ? 1 : -1) * cellHeight) / 2}
-							h 10 `}
+              d={
+                isSameRow
+                  ? taskStartX > depEndX
+                    ? `M ${depEndX} ${depY} h ${taskStartX - depEndX}`
+                    : `M ${taskEndX} ${depY} h ${depStartX - taskEndX}`
+                  : `M ${depEndX} ${depY} 
+                h 10
+                ${
+                  taskStartX - depEndX - 20 > 0
+                    ? `h ${taskStartX - depEndX - 20} v ${isTaskHigher && '-'}${cellHeight / 2}`
+                    : `v ${isTaskHigher && '-'}${cellHeight / 2} h ${taskStartX - depEndX - 20}`
+                }
+                v ${cellHeight * (t.rowIndex - tD.rowIndex) + ((isTaskHigher ? 1 : -1) * cellHeight) / 2}
+                h 10 `
+              }
             />
             <polygon
               fill='grey'
-              points={`${taskStartX},${taskY}
+              points={
+                isSameRow && taskStartX <= depEndX
+                  ? `${taskEndX},${taskY}
+								${taskEndX + 5},${taskY - 5}
+								${taskEndX + 5},${taskY + 5}`
+                  : `${taskStartX},${taskY}
 								${taskStartX - 5},${taskY - 5}
-								${taskStartX - 5},${taskY + 5}`}
+								${taskStartX - 5},${taskY + 5}`
+              }
             />
           </g>
         )
@@ -358,7 +383,7 @@ export const Gantt = ({ tasks, locale = 'en', theme = 'light', viewMode = 'days'
   const TaskRowsTimePeriods = ({ y }: { y: number }) => {
     return (
       <g>
-        {taskGraphArr.map((t, taskIndex) => {
+        {taskGraphArr.map((t) => {
           const x = ((t.start - startDate.getTime()) / cellMs) * cellWidth
           const width = ((t.end - t.start) / cellMs) * cellWidth
           return (
@@ -366,7 +391,7 @@ export const Gantt = ({ tasks, locale = 'en', theme = 'light', viewMode = 'days'
               key={`${t.task.id}`}
               className='task-rect'
               x={x}
-              y={y + taskIndex * cellHeight + 7}
+              y={y + t.rowIndex * cellHeight + 7}
               width={width}
               height={cellHeight - 14}
               ry={3}
@@ -416,7 +441,7 @@ export const Gantt = ({ tasks, locale = 'en', theme = 'light', viewMode = 'days'
           ? '#f5f5f5'
           : '#fff'
       res.push(
-        <rect key={currentCellMs} x={curX} y={y} width={cellWidth} height={cellHeight * tasks.length} fill={fill} />,
+        <rect key={currentCellMs} x={curX} y={y} width={cellWidth} height={cellHeight * rows.length} fill={fill} />,
       )
       curX += cellWidth
       currentCellMs += cellMs
@@ -426,7 +451,7 @@ export const Gantt = ({ tasks, locale = 'en', theme = 'light', viewMode = 'days'
   const TimeGrid = () => {
     const columnsCount = (endDate.getTime() - startDate.getTime()) / cellMs
     const timeLineWidth = cellWidth * columnsCount
-    const timeGridHeight = cellHeight * tasks.length + 10
+    const timeGridHeight = cellHeight * rows.length + 10
     return (
       <div style={{ overflowX: 'scroll' }}>
         <svg width={timeLineWidth + leftPadding / 2} height={timeGridHeight + cellHeight}>
@@ -463,7 +488,7 @@ export const Gantt = ({ tasks, locale = 'en', theme = 'light', viewMode = 'days'
           <Cells y={cellHeight + 10} />
           <RowLines
             y={cellHeight + 10}
-            amount={tasks.length + 1}
+            amount={rows.length + 1}
             spaceY={cellHeight}
             width={timeLineWidth + leftPadding}
           />
@@ -484,9 +509,9 @@ export const Gantt = ({ tasks, locale = 'en', theme = 'light', viewMode = 'days'
     <div id='gantt-container' className={`react-gantt-accurate ${theme}`}>
       <div className='gantt-grid-container'>
         <div className='gantt-grid-container__tasks' style={{ marginTop: `${cellHeight + 10}px` }}>
-          {tasks.map((task) => (
-            <div key={task.id} className='gantt-task-row' style={{ height: `${cellHeight}px` }}>
-              {task.name}
+          {rows.map((row, index) => (
+            <div key={index} className='gantt-task-row' style={{ height: `${cellHeight}px` }}>
+              {row.name}
             </div>
           ))}
         </div>
