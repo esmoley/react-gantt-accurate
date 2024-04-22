@@ -7,6 +7,7 @@ type Task = {
   id: string
   start: TaskDate
   end: TaskDate
+  color?: string
   dependencies?: string[]
 }
 type Row = {
@@ -389,7 +390,7 @@ export const Gantt = ({ rows, locale = 'en', theme = 'light', viewMode = 'days' 
           return (
             <rect
               key={`${t.task.id}`}
-              className='task-rect'
+              fill={t?.task.color ?? '#91bbfe'}
               x={x}
               y={y + t.rowIndex * cellHeight + 7}
               width={width}
