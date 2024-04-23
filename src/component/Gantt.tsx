@@ -506,7 +506,7 @@ export const Gantt = ({ rows, locale = 'en', theme = 'light', viewMode = 'days' 
     )
   }
   return (
-    <div id='gantt-container' className={`react-gantt-accurate ${theme}`}>
+    <div className={`react-gantt-accurate ${theme}`}>
       <div className='gantt-grid-container'>
         <div className='gantt-grid-container__tasks' style={{ marginTop: `${cellHeight + 10}px` }}>
           {rows.map((row, index) => (
