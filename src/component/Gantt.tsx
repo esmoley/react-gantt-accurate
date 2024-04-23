@@ -65,7 +65,6 @@ export const Gantt = ({ rows, locale = 'en', theme = 'light', viewMode = 'days' 
   }, new Map<string, TaskGraph>())
 
   const taskGraphArr: TaskGraph[] = Array.from(taskGraphMap.values())
-  console.log({ taskGraphMap, taskGraphArr })
   //udpate deps
   taskGraphMap.forEach((t) =>
     t.task.dependencies?.forEach((tDepId) => taskGraphMap.has(tDepId) && t.dependencies.push(taskGraphMap.get(tDepId))),
