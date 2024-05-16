@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { getDayOfWeek } from '../util/ganttUtils'
 import { Locale } from '../util/types'
 import './styles.css'
@@ -9,6 +9,7 @@ type Task = {
   end: TaskDate
   color?: string
   dependencies?: string[]
+  tooltip?: string | JSX.Element
 }
 type Row = {
   name: string
@@ -27,7 +28,6 @@ type TaskGraph = {
   task: Task
   start: number
   end: number
-
   dependencies: TaskGraph[]
 }
 const cellWidth = 30
@@ -38,8 +38,43 @@ const secondMs = 1000
 const minuteMs = 60 * 1000
 const hourMs = 60 * 60 * 1000
 const dayMs = 24 * 60 * 60 * 1000 // hours*minutes*seconds*milliseconds
+const timePeriodHeight = cellHeight - 14
 
+const leftPanelWidth = 150
+type TaskTooltipProps = {
+  id: string
+  left: number
+  top: number
+  show: boolean
+  content: string | JSX.Element
+}
+const TaskTooltip = ({ left, top, show, content }: TaskTooltipProps) => {
+  if (!show) return <></>
+  return (
+    <div style={{ left, top, position: 'absolute' }}>
+      <div
+        style={{
+          border: '1px solid black',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          color: 'black',
+          background: '#fff',
+        }}
+      >
+        {content}
+      </div>
+    </div>
+  )
+}
+let timer: NodeJS.Timeout = null
 export const Gantt = ({ rows, locale = 'en', theme = 'light', viewMode = 'days' }: GanntProps) => {
+  const [taskTooltipProps, setTaskTooltipProps] = useState<TaskTooltipProps>({
+    id: '',
+    left: 150,
+    top: 150,
+    show: false,
+    content: null,
+  })
   const cellMs =
     viewMode === 'hours'
       ? hourMs
@@ -50,7 +85,16 @@ export const Gantt = ({ rows, locale = 'en', theme = 'light', viewMode = 'days' 
       : viewMode === 'milliseconds'
       ? millisecondMs
       : dayMs
-
+  useEffect(() => {
+    timer = setInterval(() => {
+      console.log({
+        windowInnerWidth: window.innerWidth,
+      })
+    }, 1000)
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [])
   const taskGraphMap: Map<string, TaskGraph> = rows.reduce((accRows, row, rowIndex) => {
     return row.tasks.reduce((acc, task, index) => {
       return acc.set(task.id, {
@@ -79,6 +123,8 @@ export const Gantt = ({ rows, locale = 'en', theme = 'light', viewMode = 'days' 
     taskGraphArr[0],
   )
   const lowestTaskStartDate = new Date(lowestTaskGraphStart.start)
+
+  //#region startDate
   const startDate =
     viewMode === 'hours'
       ? new Date(
@@ -129,7 +175,10 @@ export const Gantt = ({ rows, locale = 'en', theme = 'light', viewMode = 'days' 
           0,
           0,
         )
+  //#endregion startDate
   const highestTaskEndDate = new Date(highestTaskGraphEnd.end)
+
+  //#region endDate
   const endDate =
     viewMode === 'hours'
       ? new Date(
@@ -180,7 +229,7 @@ export const Gantt = ({ rows, locale = 'en', theme = 'light', viewMode = 'days' 
           ).getTime() - 0.001,
         )
       : new Date(highestTaskEndDate.getFullYear(), highestTaskEndDate.getMonth() + 1, 1, 0, 0, 0, 0)
-
+  //#endregion endDate
   const DaysRow = ({ y }: { y: number }) => {
     const res = []
     const day = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 0, 0, 0, 0)
@@ -386,16 +435,30 @@ export const Gantt = ({ rows, locale = 'en', theme = 'light', viewMode = 'days' 
         {taskGraphArr.map((t) => {
           const x = ((t.start - startDate.getTime()) / cellMs) * cellWidth
           const width = ((t.end - t.start) / cellMs) * cellWidth
+          const curY = y + t.rowIndex * cellHeight + 7
+
           return (
             <rect
               key={`${t.task.id}`}
               fill={t?.task.color ?? '#91bbfe'}
               x={x}
-              y={y + t.rowIndex * cellHeight + 7}
+              y={curY}
               width={width}
-              height={cellHeight - 14}
+              height={timePeriodHeight}
               ry={3}
               rx={3}
+              style={{ cursor: t.task.tooltip ? 'pointer' : 'default' }}
+              onMouseOverCapture={() => {
+                if (!t.task.tooltip || (taskTooltipProps.show && taskTooltipProps.id === t.task.id)) return
+                setTaskTooltipProps({
+                  id: t.task.id,
+                  left: leftPanelWidth + x + 15 + width,
+                  top: curY + timePeriodHeight / 2,
+                  show: true,
+                  content: t.task.tooltip,
+                })
+              }}
+              onMouseOutCapture={() => setTaskTooltipProps({ id: '', left: 0, top: 0, show: false, content: null })}
             />
           )
         })}
@@ -453,7 +516,7 @@ export const Gantt = ({ rows, locale = 'en', theme = 'light', viewMode = 'days' 
     const timeLineWidth = cellWidth * columnsCount
     const timeGridHeight = cellHeight * rows.length + 10
     return (
-      <div style={{ overflowX: 'scroll' }}>
+      <div>
         <svg width={timeLineWidth + leftPadding / 2} height={timeGridHeight + cellHeight}>
           {viewMode === 'days' && (
             <>
@@ -506,8 +569,8 @@ export const Gantt = ({ rows, locale = 'en', theme = 'light', viewMode = 'days' 
     )
   }
   return (
-    <div className={`react-gantt-accurate ${theme}`}>
-      <div className='gantt-grid-container'>
+    <div className={`react-gantt-accurate ${theme}`} style={{ position: 'relative' }}>
+      <div className='gantt-grid-container' style={{ gridTemplateColumns: `${leftPanelWidth}px 1fr` }}>
         <div className='gantt-grid-container__tasks' style={{ marginTop: `${cellHeight + 10}px` }}>
           {rows.map((row, index) => (
             <div key={index} className='gantt-task-row' style={{ height: `${cellHeight}px` }}>
@@ -517,6 +580,7 @@ export const Gantt = ({ rows, locale = 'en', theme = 'light', viewMode = 'days' 
         </div>
         <TimeGrid />
       </div>
+      <TaskTooltip {...taskTooltipProps} />
     </div>
   )
 }

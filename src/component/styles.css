@@ -10,7 +10,6 @@
 
   .gantt-grid-container {
     display: grid;
-    grid-template-columns: 150px 1fr;
     background: white;
     width: fit-content;
   }
