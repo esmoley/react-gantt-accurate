@@ -66,7 +66,6 @@ const TaskTooltip = ({ left, top, show, content }: TaskTooltipProps) => {
     </div>
   )
 }
-let timer: NodeJS.Timeout = null
 export const Gantt = ({ rows, locale = 'en', theme = 'light', viewMode = 'days' }: GanntProps) => {
   const [taskTooltipProps, setTaskTooltipProps] = useState<TaskTooltipProps>({
     id: '',
@@ -85,16 +84,6 @@ export const Gantt = ({ rows, locale = 'en', theme = 'light', viewMode = 'days' 
       : viewMode === 'milliseconds'
       ? millisecondMs
       : dayMs
-  useEffect(() => {
-    timer = setInterval(() => {
-      console.log({
-        windowInnerWidth: window.innerWidth,
-      })
-    }, 1000)
-    return () => {
-      clearTimeout(timer)
-    }
-  }, [])
   const taskGraphMap: Map<string, TaskGraph> = rows.reduce((accRows, row, rowIndex) => {
     return row.tasks.reduce((acc, task, index) => {
       return acc.set(task.id, {
