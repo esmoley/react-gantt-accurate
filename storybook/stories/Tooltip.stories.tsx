@@ -42,8 +42,7 @@ export const JSX = {
               <div
                 style={{
                   fontSize: '14px',
-                  fontFamily:
-                    'Arial, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Fira Sans&quot;, &quot;Droid Sans&quot;, &quot;Helvetica Neue&quot;;',
+                  fontFamily: 'Arial, Roboto, Oxygen, Ubuntu, Cantarell',
                 }}
               >
                 <b>Example: 20-4-2023 - 22-4-2023</b>
