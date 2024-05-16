@@ -40,16 +40,15 @@ export const JSX = {
             end: new Date('2024-04-21 19:06:18'),
             tooltip: (
               <div
-                className='_3T42e'
                 style={{
                   fontSize: '14px',
                   fontFamily:
                     'Arial, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Fira Sans&quot;, &quot;Droid Sans&quot;, &quot;Helvetica Neue&quot;;',
                 }}
               >
-                <b>67: 20-4-2023 - 22-4-2023</b>
-                <p className='_29NTg'>Duration: 2 day(s)</p>
-                <p className='_29NTg'>Progress: 78 %</p>
+                <b>Example: 20-4-2023 - 22-4-2023</b>
+                <p>Duration: 2 day(s)</p>
+                <p>Progress: 78 %</p>
               </div>
             ),
           },
