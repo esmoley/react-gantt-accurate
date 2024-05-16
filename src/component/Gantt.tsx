@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { getDayOfWeek } from '../util/ganttUtils'
 import { Locale } from '../util/types'
 import './styles.css'
