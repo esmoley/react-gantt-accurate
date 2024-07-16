@@ -7,7 +7,7 @@ export default {
   tags: ['autodocs'],
 }
 
-export const En = {
+export const Default = {
   render: () => {
     const rows = [
       {
@@ -21,7 +21,7 @@ export const En = {
         ],
       },
     ]
-    return <Gantt rows={rows} locale='en' namesPanelWidth={300} />
+    return <Gantt rows={rows} namesPanelWidth={300} />
   },
   args: {},
   argTypes: {},
