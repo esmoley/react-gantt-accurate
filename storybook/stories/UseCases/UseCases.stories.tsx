@@ -7,84 +7,23 @@ export default {
   tags: ['autodocs'],
 }
 
-export const Light = {
+export const LongName = {
   render: () => {
     const rows = [
       {
-        name: 'First Task',
+        name: 'ExternalModule.dl_LoadingTests.Module : 213 : LongText.Write(); / UserLong / 11420',
         tasks: [
           {
-            id: 'Task 1',
-            start: new Date('2024-04-20 12:06:18'),
-            end: new Date('2024-04-21 19:06:18'),
-          },
-        ],
-      },
-      {
-        name: 'Second Task',
-        tasks: [
-          {
-            id: 'Task 2',
-            start: new Date('2024-04-20 2:06:18'),
-            end: new Date('2024-04-21 23:06:18'),
-            dependencies: ['Task 3'],
-          },
-        ],
-      },
-      {
-        name: 'Third Task',
-        tasks: [
-          {
-            id: 'Task 3',
-            start: new Date('2024-04-20 1:06:18'),
-            end: new Date('2024-04-22 19:06:18'),
-          },
-        ],
-      },
-      {
-        name: 'Fourth Task',
-        tasks: [
-          {
-            id: 'Task 4',
-            start: new Date('2024-04-20 0:06:18'),
-            end: new Date('2024-04-21 19:06:18'),
-          },
-          {
-            id: 'Task 4.1',
-            start: new Date('2024-04-23 0:06:18'),
-            end: new Date('2024-04-24 19:06:18'),
-            dependencies: ['Task 4'],
-          },
-        ],
-      },
-      {
-        name: 'Fifth Task',
-        tasks: [
-          {
-            id: 'Task 5',
-            start: new Date('2024-04-21 19:06:18'),
-            end: new Date('2024-04-22 19:06:18'),
-            dependencies: ['Task 5.1'],
-          },
-          {
-            id: 'Task 5.1',
-            start: new Date('2024-04-23 19:06:18'),
-            end: new Date('2024-04-24 19:06:18'),
-          },
-        ],
-      },
-      {
-        name: 'Sixth Task',
-        tasks: [
-          {
-            id: 'Task 6',
-            start: new Date('2024-04-21 19:06:18'),
-            end: new Date('2024-04-22 19:06:18'),
+            id: 'victim_16294',
+            start: new Date('2024-06-27T19:32:15.373Z'),
+            end: new Date('2024-06-27T19:32:20.389Z'),
+            color: '#edbd00',
+            tooltip: '\r\nModule.dl_LoadingTests.Module : 213 : LongText.Write();',
           },
         ],
       },
     ]
-    return <Gantt rows={rows} theme='light' />
+    return <Gantt rows={rows} theme='light' viewMode='seconds' />
   },
   args: {},
   argTypes: {},
