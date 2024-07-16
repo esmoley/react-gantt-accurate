@@ -21,6 +21,7 @@ type GanntProps = {
   locale?: Locale
   theme?: 'light' | 'dark'
   viewMode?: 'days' | 'hours' | 'minutes' | 'seconds' | 'milliseconds'
+  namesPanelWidth?: number
 }
 type TaskGraph = {
   rowIndex: number
@@ -40,7 +41,6 @@ const hourMs = 60 * 60 * 1000
 const dayMs = 24 * 60 * 60 * 1000 // hours*minutes*seconds*milliseconds
 const timePeriodHeight = cellHeight - 14
 
-const leftPanelWidth = 150
 type TaskTooltipProps = {
   id: string
   left: number
@@ -66,7 +66,13 @@ const TaskTooltip = ({ left, top, show, content }: TaskTooltipProps) => {
     </div>
   )
 }
-export const Gantt = ({ rows, locale = 'en', theme = 'light', viewMode = 'days' }: GanntProps) => {
+export const Gantt = ({
+  rows,
+  locale = 'en',
+  theme = 'light',
+  viewMode = 'days',
+  namesPanelWidth = 150,
+}: GanntProps) => {
   const [taskTooltipProps, setTaskTooltipProps] = useState<TaskTooltipProps>({
     id: '',
     left: 150,
@@ -441,7 +447,7 @@ export const Gantt = ({ rows, locale = 'en', theme = 'light', viewMode = 'days' 
                 if (!t.task.tooltip || (taskTooltipProps.show && taskTooltipProps.id === t.task.id)) return
                 setTaskTooltipProps({
                   id: t.task.id,
-                  left: leftPanelWidth + x + 15 + width,
+                  left: namesPanelWidth + x + 15 + width,
                   top: curY + timePeriodHeight / 2,
                   show: true,
                   content: t.task.tooltip,
@@ -559,13 +565,13 @@ export const Gantt = ({ rows, locale = 'en', theme = 'light', viewMode = 'days' 
   }
   return (
     <div className={`react-gantt-accurate ${theme}`} style={{ position: 'relative' }}>
-      <div className='gantt-grid-container' style={{ gridTemplateColumns: `${leftPanelWidth}px 1fr` }}>
+      <div className='gantt-grid-container' style={{ gridTemplateColumns: `${namesPanelWidth}px 1fr` }}>
         <div className='gantt-grid-container__tasks' style={{ marginTop: `${cellHeight + 10}px` }}>
           {rows.map((row, index) => (
             <div key={index} className='gantt-task-row' style={{ height: `${cellHeight}px` }}>
               <div
                 style={{
-                  maxWidth: `${leftPanelWidth}px`,
+                  maxWidth: `${namesPanelWidth}px`,
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
                   overflowX: 'clip',
