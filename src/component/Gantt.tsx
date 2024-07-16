@@ -563,7 +563,17 @@ export const Gantt = ({ rows, locale = 'en', theme = 'light', viewMode = 'days' 
         <div className='gantt-grid-container__tasks' style={{ marginTop: `${cellHeight + 10}px` }}>
           {rows.map((row, index) => (
             <div key={index} className='gantt-task-row' style={{ height: `${cellHeight}px` }}>
-              {row.name}
+              <div
+                style={{
+                  maxWidth: `${leftPanelWidth}px`,
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  overflowX: 'clip',
+                }}
+                title={row.name}
+              >
+                {row.name}
+              </div>
             </div>
           ))}
         </div>
