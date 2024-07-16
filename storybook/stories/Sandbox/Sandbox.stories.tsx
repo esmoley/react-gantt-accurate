@@ -1,8 +1,8 @@
 import React from 'react'
-import { Gantt } from '../../src'
+import { Gantt } from '../../../src'
 
 export default {
-  title: 'ReactGanttAccurate/Sandbox',
+  title: 'Sandbox',
   component: <></>,
   tags: ['autodocs'],
 }

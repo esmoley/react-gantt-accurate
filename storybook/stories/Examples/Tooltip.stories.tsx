@@ -1,8 +1,8 @@
 import React from 'react'
-import { Gantt } from '../../src'
+import { Gantt } from '../../../src'
 
 export default {
-  title: 'ReactGanttAccurate/Tooltip',
+  title: 'Examples/Tooltip',
   component: <></>,
   tags: ['autodocs'],
 }

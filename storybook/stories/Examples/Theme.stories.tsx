@@ -1,13 +1,13 @@
 import React from 'react'
-import { Gantt } from '../../src'
+import { Gantt } from '../../../src'
 
 export default {
-  title: 'ReactGanttAccurate/Locale',
+  title: 'Examples/Theme',
   component: <></>,
   tags: ['autodocs'],
 }
 
-export const En = {
+export const Light = {
   render: () => {
     const rows = [
       {
@@ -84,12 +84,12 @@ export const En = {
         ],
       },
     ]
-    return <Gantt rows={rows} locale='en' />
+    return <Gantt rows={rows} theme='light' />
   },
   args: {},
   argTypes: {},
 }
-export const Ru = {
+export const Dark = {
   render: () => {
     const rows = [
       {
@@ -166,7 +166,7 @@ export const Ru = {
         ],
       },
     ]
-    return <Gantt rows={rows} locale='ru' />
+    return <Gantt rows={rows} theme='dark' />
   },
   args: {},
   argTypes: {},

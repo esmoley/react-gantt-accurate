@@ -1,8 +1,8 @@
 import React from 'react'
-import { Gantt } from '../../src'
+import { Gantt } from '../../../src'
 
 export default {
-  title: 'ReactGanttAccurate/ViewMode',
+  title: 'Examples/ViewMode',
   component: <></>,
   tags: ['autodocs'],
 }
