@@ -575,6 +575,7 @@ export const Gantt = ({
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
                   overflowX: 'clip',
+                  padding: '0 5px',
                 }}
                 title={row.name}
               >
