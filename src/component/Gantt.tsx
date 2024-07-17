@@ -22,6 +22,7 @@ type GanntProps = {
   theme?: 'light' | 'dark'
   viewMode?: 'days' | 'hours' | 'minutes' | 'seconds' | 'milliseconds'
   namesPanelWidth?: number
+  namesPanelTextAlign?: React.CSSProperties['textAlign']
 }
 type TaskGraph = {
   rowIndex: number
@@ -72,6 +73,7 @@ export const Gantt = ({
   theme = 'light',
   viewMode = 'days',
   namesPanelWidth = 150,
+  namesPanelTextAlign = 'center',
 }: GanntProps) => {
   const [taskTooltipProps, setTaskTooltipProps] = useState<TaskTooltipProps>({
     id: '',
@@ -576,6 +578,8 @@ export const Gantt = ({
                   whiteSpace: 'nowrap',
                   overflowX: 'clip',
                   padding: '0 5px',
+                  width: '100%',
+                  textAlign: namesPanelTextAlign,
                 }}
                 title={row.name}
               >
