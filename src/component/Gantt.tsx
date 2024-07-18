@@ -10,6 +10,7 @@ type Task = {
   color?: string
   dependencies?: string[]
   tooltip?: string | JSX.Element
+  onClick?: () => void
 }
 type Row = {
   name: string
@@ -535,6 +536,7 @@ export const Gantt = ({
                 setTaskTooltipProps(upd)
               }}
               onMouseOutCapture={hideTooltip}
+              onClick={t.task.onClick}
             />
           )
         })}
