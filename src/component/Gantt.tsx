@@ -63,7 +63,6 @@ const TaskTooltip = ({ top, show, content, taskX, taskWidth, hideTooltip }: Task
   const [innerRight, setInnerRight] = useState<React.CSSProperties['left']>(null)
   const [topUpdated, setTopUpdated] = useState<React.CSSProperties['top']>(top)
   const [step, setStep] = useState<'Initial' | 'UpdateOrientation' | 'SetTop' | 'SetBottom' | 'Done'>('Initial')
-  //const [lastUpdate, setLastUpdate] = useState<number>(Date.now())
   const windowWidthScrolled = window.scrollX + window.innerWidth
 
   useEffect(() => {
@@ -115,28 +114,6 @@ const TaskTooltip = ({ top, show, content, taskX, taskWidth, hideTooltip }: Task
     }
     setStep('Done')
   }, [step, show, top])
-
-  // useEffect(() => {
-  //   const handleResize = () => {
-  //     if(step != "Done" || lastUpdate + 100 > Date.now()) return
-  //     setStep("Initial")
-  //   };
-  //   window.addEventListener('resize', handleResize);
-  //   return () => {
-  //     window.removeEventListener('resize', handleResize);
-  //   };
-  // }, [step, lastUpdate]);
-
-  // useEffect(() => {
-  //   const handleScroll = () => {
-  //     if(step != "Done" || lastUpdate + 100 > Date.now()) return
-  //     setStep("Initial")
-  //   };
-  //   window.addEventListener('scroll', handleScroll);
-  //   return () => {
-  //     window.removeEventListener('scroll', handleScroll);
-  //   };
-  // }, [step, lastUpdate]);
 
   if (!show) return <></>
 
