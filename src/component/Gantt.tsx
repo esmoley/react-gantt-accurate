@@ -476,8 +476,8 @@ export const Gantt = ({
                 h 10
                 ${
                   taskStartX - depEndX - 20 > 0
-                    ? `h ${taskStartX - depEndX - 20} v ${isTaskHigher && '-'}${cellHeight / 2}`
-                    : `v ${isTaskHigher && '-'}${cellHeight / 2} h ${taskStartX - depEndX - 20}`
+                    ? `h ${taskStartX - depEndX - 20} v ${isTaskHigher ? '-' : ''}${cellHeight / 2}`
+                    : `v ${isTaskHigher ? '-' : ''}${cellHeight / 2} h ${taskStartX - depEndX - 20}`
                 }
                 v ${cellHeight * (t.rowIndex - tD.rowIndex) + ((isTaskHigher ? 1 : -1) * cellHeight) / 2}
                 h 10 `

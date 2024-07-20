@@ -57,3 +57,69 @@ export const LongTooltip = {
   args: {},
   argTypes: {},
 }
+
+export const DependencyLower = {
+  render: () => {
+    const rows = [
+      {
+        name: '>> Task 1',
+        tasks: [
+          {
+            start: new Date('2024-07-16T10:46:47.893Z'),
+            end: new Date('2024-07-16T10:47:07.955Z'),
+            id: '1',
+            tooltip: '>> Task 1',
+            color: '#c6ffb3',
+          },
+          {
+            start: new Date('2024-07-16T10:46:47.893Z'),
+            end: new Date('2024-07-16T10:46:47.893Z'),
+            id: '2',
+            tooltip: '>> Task 1 / 2',
+            color: '#fff0b3',
+          },
+        ],
+      },
+      {
+        name: '>> Task 2',
+        tasks: [
+          {
+            start: new Date('2024-07-16T10:46:46.455Z'),
+            end: new Date('2024-07-16T10:47:08.127Z'),
+            id: '3',
+            tooltip: '>> Task 2',
+            color: '#c6ffb3',
+          },
+        ],
+      },
+      {
+        name: '>> Task 3',
+        tasks: [
+          {
+            start: new Date('2024-07-16T10:46:47.049Z'),
+            end: new Date('2024-07-16T10:47:08.002Z'),
+            id: '4',
+            tooltip: '>> Task 3',
+            color: '#ff8533',
+          },
+        ],
+      },
+      {
+        name: '>> Task 4',
+        tasks: [
+          {
+            start: new Date('2024-07-16T10:46:47.955Z'),
+            end: new Date('2024-07-16T10:47:07.955Z'),
+            id: '5',
+            tooltip: '>> Task 4',
+            color: '#ff8533',
+            dependencies: ['1'],
+          },
+        ],
+      },
+    ]
+    return <Gantt rows={rows} theme='light' viewMode='seconds' />
+  },
+  args: {},
+  argTypes: {},
+}
