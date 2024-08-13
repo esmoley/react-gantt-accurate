@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { getDayOfWeek } from '../util/ganttUtils'
+import { getDayOfWeek, getNoDataText } from '../util/ganttUtils'
 import { Locale } from '../util/types'
 import './styles.css'
 type TaskDate = Date | number
@@ -166,7 +166,7 @@ export const Gantt = ({
       : viewMode === 'milliseconds'
       ? millisecondMs
       : dayMs
-  const taskGraphMap: Map<string, TaskGraph> = rows.reduce((accRows, row, rowIndex) => {
+  const taskGraphMap: Map<string, TaskGraph> = rows?.reduce((accRows, row, rowIndex) => {
     return row.tasks.reduce((acc, task, index) => {
       return acc.set(task.id, {
         rowIndex,
@@ -187,13 +187,13 @@ export const Gantt = ({
 
   const lowestTaskGraphStart: TaskGraph = taskGraphArr.reduce(
     (acc, task) => (task.start < acc.start ? task : acc),
-    taskGraphArr[0],
+    taskGraphArr.length ? taskGraphArr[0] : null,
   )
   const highestTaskGraphEnd: TaskGraph = taskGraphArr.reduce(
     (acc, task) => (task.end > acc.end ? task : acc),
-    taskGraphArr[0],
+    taskGraphArr.length ? taskGraphArr[0] : null,
   )
-  const lowestTaskStartDate = new Date(lowestTaskGraphStart.start)
+  const lowestTaskStartDate = new Date(lowestTaskGraphStart?.start ?? 0)
 
   //#region startDate
   const startDate =
@@ -247,7 +247,7 @@ export const Gantt = ({
           0,
         )
   //#endregion startDate
-  const highestTaskEndDate = new Date(highestTaskGraphEnd.end)
+  const highestTaskEndDate = new Date(highestTaskGraphEnd?.end ?? 0)
 
   //#region endDate
   const endDate =
@@ -653,27 +653,33 @@ export const Gantt = ({
   return (
     <div className={`react-gantt-accurate ${theme}`} style={{ position: 'relative' }}>
       <div className='gantt-grid-container' style={{ gridTemplateColumns: `${namesPanelWidth}px 1fr` }}>
-        <div className='gantt-grid-container__tasks' style={{ marginTop: `${cellHeight + 10}px` }}>
-          {rows.map((row, index) => (
-            <div key={index} className='gantt-task-row' style={{ height: `${cellHeight}px` }}>
-              <div
-                style={{
-                  maxWidth: `${namesPanelWidth}px`,
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  overflowX: 'clip',
-                  padding: '0 5px',
-                  width: '100%',
-                  textAlign: namesPanelTextAlign,
-                }}
-                title={row.name}
-              >
-                {row.name}
-              </div>
+        {rows.length ? (
+          <>
+            <div className='gantt-grid-container__tasks' style={{ marginTop: `${cellHeight + 10}px` }}>
+              {rows.map((row, index) => (
+                <div key={index} className='gantt-task-row' style={{ height: `${cellHeight}px` }}>
+                  <div
+                    style={{
+                      maxWidth: `${namesPanelWidth}px`,
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      overflowX: 'clip',
+                      padding: '0 5px',
+                      width: '100%',
+                      textAlign: namesPanelTextAlign,
+                    }}
+                    title={row.name}
+                  >
+                    {row.name}
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-        <TimeGrid />
+            <TimeGrid />
+          </>
+        ) : (
+          <div className='gantt-no-data'>{getNoDataText(locale)}</div>
+        )}
       </div>
       <TaskTooltip {...taskTooltipProps} />
     </div>

@@ -6,11 +6,13 @@
   font-variant: tabular-nums;
   line-height: 1.5715;
   font-feature-settings: 'tnum';
-
+  
   .gantt-grid-container {
     display: grid;
     background: white;
     width: fit-content;
+    min-width: 400px;
+    min-height: 150px;
   }
   .gantt-task-row {
     grid-column: 1/-1;
@@ -55,6 +57,16 @@
     & > polygon{
       fill:grey;
     }
+  }
+  .gantt-no-data{
+    grid-column: 1/-1;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    color: #616161;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   &.dark{
     .gantt-grid-container{
