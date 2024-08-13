@@ -519,7 +519,10 @@ export const Gantt = ({
               height={timePeriodHeight}
               ry={3}
               rx={3}
-              style={{ cursor: t.task.tooltip || t.task.onClick ? 'pointer' : 'default' }}
+              style={{
+                cursor: t.task.tooltip || t.task.onClick ? 'pointer' : 'default',
+              }}
+              className={`task-rect${t.task.onClick ? ' onclick' : ''}`}
               onMouseOverCapture={() => {
                 if (!t.task.tooltip || (taskTooltipProps.show && taskTooltipProps.id === t.task.id)) return
                 const upd = {
