@@ -655,7 +655,8 @@ export const Gantt = ({
       <div className='gantt-grid-container' style={{ gridTemplateColumns: `${namesPanelWidth}px 1fr` }}>
         {rows.length ? (
           <>
-            <div className='gantt-grid-container__tasks' style={{ marginTop: `${cellHeight + 10}px` }}>
+            <div className='gantt-grid-container__tasks'>
+              <div className='gantt-task-row-top' style={{ marginTop: `${cellHeight + 9}px` }}></div>
               {rows.map((row, index) => (
                 <div key={index} className='gantt-task-row' style={{ height: `${cellHeight}px` }}>
                   <div

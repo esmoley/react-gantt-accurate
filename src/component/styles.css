@@ -14,6 +14,11 @@
     min-width: 400px;
     min-height: 150px;
   }
+  .gantt-task-row-top{
+    width: 100%;
+    color: #616161;
+    border-bottom: 1px #a6a4a44d solid;
+  }
   .gantt-task-row {
     grid-column: 1/-1;
     width: 100%;
@@ -29,7 +34,6 @@
   .gantt-task-row:last-of-type{
     border-bottom: 1px #a6a4a44d solid;
   }
-
   .gantt-task-row button {
     border: none;
     height: 40px;
@@ -70,36 +74,28 @@
   }
   &.dark{
     .gantt-grid-container{
-      background: #424242;
+      background: #1F1F1F;
     }
     .days-row {
-      fill: #e7e7e7;
+      fill: #b7b7b7;
     }
     .gantt-task-row{
-      color: #e7e7e7;
+      color: #cfcfcf;
     }
     .cell-rect-secondary{
       fill:#333333;
     }
     .cell-rect-primary{
-      fill:#424242;
+      fill:#1F1F1F;
     }
     .cell-line {
-      stroke: #212121;
+      stroke: #4e4e4e;
     }
     .gantt-task-row:first-of-type{
-      box-shadow: 0 -1px 0 #212121;
+      box-shadow: 0 -1px 0 #4e4e4e;
     }
     .gantt-task-row:last-of-type{
-      border-bottom: 1px #212121 solid;
-    }
-    .arrow{
-      & > path{
-        stroke:#cccaca;
-      }
-      & > polygon{
-        fill:#cccaca;
-      }
+      border-bottom: 1px #4e4e4e solid;
     }
   }
 }
