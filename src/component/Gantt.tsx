@@ -462,9 +462,8 @@ export const Gantt = ({
         const isSameRow = t.rowIndex === tD.rowIndex
 
         return (
-          <g key={t.task.id}>
+          <g key={t.task.id} className='arrow'>
             <path
-              stroke='grey'
               fill='none'
               strokeWidth={1.5}
               d={
@@ -484,7 +483,6 @@ export const Gantt = ({
               }
             />
             <polygon
-              fill='grey'
               points={
                 isSameRow && taskStartX <= depEndX
                   ? `${taskEndX},${taskY}
@@ -575,14 +573,20 @@ export const Gantt = ({
     let curX = 0
     while (currentCellMs < endDate.getTime() + cellMs) {
       const currentDate = new Date(currentCellMs)
-      const fill =
-        viewMode === 'days' && getDayOfWeek(currentDate) === 'S'
-          ? '#f5f5f5'
-          : viewMode === 'hours' && currentDate.getHours() >= 12
-          ? '#f5f5f5'
-          : '#fff'
       res.push(
-        <rect key={currentCellMs} x={curX} y={y} width={cellWidth} height={cellHeight * rows.length} fill={fill} />,
+        <rect
+          key={currentCellMs}
+          x={curX}
+          y={y}
+          width={cellWidth}
+          height={cellHeight * rows.length}
+          className={
+            (viewMode === 'days' && getDayOfWeek(currentDate) === 'S') ||
+            (viewMode === 'hours' && currentDate.getHours() >= 12)
+              ? 'cell-rect-secondary'
+              : 'cell-rect-primary'
+          }
+        />,
       )
       curX += cellWidth
       currentCellMs += cellMs

@@ -39,8 +39,22 @@
   .cell-line{
     stroke: #dce4e7;
   }
+  .cell-rect-secondary{
+    fill:#f5f5f5;
+  }
+  .cell-rect-primary{
+    fill:#fff;
+  }
   .task-rect{
     fill:#91bbfe;
+  }
+  .arrow{
+    & > path{
+      stroke:grey;
+    }
+    & > polygon{
+      fill:grey;
+    }
   }
   &.dark{
     .gantt-grid-container{
@@ -51,6 +65,29 @@
     }
     .gantt-task-row{
       color: #e7e7e7;
+    }
+    .cell-rect-secondary{
+      fill:#333333;
+    }
+    .cell-rect-primary{
+      fill:#424242;
+    }
+    .cell-line {
+      stroke: #212121;
+    }
+    .gantt-task-row:first-of-type{
+      box-shadow: 0 -1px 0 #212121;
+    }
+    .gantt-task-row:last-of-type{
+      border-bottom: 1px #212121 solid;
+    }
+    .arrow{
+      & > path{
+        stroke:#cccaca;
+      }
+      & > polygon{
+        fill:#cccaca;
+      }
     }
   }
 }
