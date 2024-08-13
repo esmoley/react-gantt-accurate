@@ -594,7 +594,7 @@ export const Gantt = ({
     const timeLineWidth = cellWidth * columnsCount
     const timeGridHeight = cellHeight * rows.length + 10
     return (
-      <div>
+      <div style={{ overflowX: 'auto' }}>
         <svg width={timeLineWidth + leftPadding / 2} height={timeGridHeight + cellHeight}>
           {viewMode === 'days' && (
             <>
