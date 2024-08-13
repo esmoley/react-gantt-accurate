@@ -3,12 +3,16 @@ import { getDayOfWeek, getNoDataText } from '../util/ganttUtils'
 import { Locale } from '../util/types'
 import './styles.css'
 type TaskDate = Date | number
+type DependencyTask = {
+  id: string
+  onClick?: () => void
+}
 type Task = {
   id: string
   start: TaskDate
   end: TaskDate
   color?: string
-  dependencies?: string[]
+  dependencies?: string[] | DependencyTask[]
   tooltip?: string | JSX.Element
   onClick?: () => void
 }
@@ -25,13 +29,16 @@ type GanntProps = {
   namesPanelWidth?: number
   namesPanelTextAlign?: React.CSSProperties['textAlign']
 }
+type TaskGraphDependency = TaskGraph & {
+  dependencyObj: DependencyTask
+}
 type TaskGraph = {
   rowIndex: number
   index: number
   task: Task
   start: number
   end: number
-  dependencies: TaskGraph[]
+  dependencies: TaskGraphDependency[]
 }
 const cellWidth = 30
 const cellHeight = 40
@@ -182,9 +189,20 @@ export const Gantt = ({
   const taskGraphArr: TaskGraph[] = Array.from(taskGraphMap.values())
   //udpate deps
   taskGraphMap.forEach((t) =>
-    t.task.dependencies?.forEach((tDepId) => taskGraphMap.has(tDepId) && t.dependencies.push(taskGraphMap.get(tDepId))),
+    t.task.dependencies?.forEach((dependency: string | DependencyTask) => {
+      const dependencyObj: DependencyTask =
+        typeof dependency === 'string'
+          ? {
+              id: dependency,
+            }
+          : dependency
+      taskGraphMap.has(dependencyObj.id) &&
+        t.dependencies.push({
+          ...taskGraphMap.get(dependencyObj.id),
+          dependencyObj,
+        })
+    }),
   )
-
   const lowestTaskGraphStart: TaskGraph = taskGraphArr.reduce(
     (acc, task) => (task.start < acc.start ? task : acc),
     taskGraphArr.length ? taskGraphArr[0] : null,
@@ -450,19 +468,20 @@ export const Gantt = ({
   const Dependencies = ({ y }: { y: number }) => {
     return taskGraphArr.map((t) => {
       if (t.dependencies.length === 0) return null
-      return t.dependencies.map((tD) => {
+      return t.dependencies.map((dependencyTask) => {
+        const value = dependencyTask
         const taskStartX = ((t.start - startDate.getTime()) / cellMs) * cellWidth
         const taskEndX = ((t.start - startDate.getTime() + t.end - t.start) / cellMs) * cellWidth
         const taskY = y + t.rowIndex * cellHeight + cellHeight / 2
 
-        const depStartX = ((tD.start - startDate.getTime()) / cellMs) * cellWidth
-        const depEndX = ((tD.start - startDate.getTime() + tD.end - tD.start) / cellMs) * cellWidth
-        const depY = y + tD.rowIndex * cellHeight + cellHeight / 2
-        const isTaskHigher = t.rowIndex < tD.rowIndex
-        const isSameRow = t.rowIndex === tD.rowIndex
-
+        const depStartX = ((value.start - startDate.getTime()) / cellMs) * cellWidth
+        const depEndX = ((value.start - startDate.getTime() + value.end - value.start) / cellMs) * cellWidth
+        const depY = y + value.rowIndex * cellHeight + cellHeight / 2
+        const isTaskHigher = t.rowIndex < value.rowIndex
+        const isSameRow = t.rowIndex === value.rowIndex
+        const onClick = dependencyTask.dependencyObj?.onClick
         return (
-          <g key={t.task.id} className='arrow'>
+          <g key={t.task.id} className={`arrow${onClick ? ' onclick' : ''}`} onClick={onClick}>
             <path
               fill='none'
               strokeWidth={1.5}
@@ -478,7 +497,7 @@ export const Gantt = ({
                     ? `h ${taskStartX - depEndX - 20} v ${isTaskHigher ? '-' : ''}${cellHeight / 2}`
                     : `v ${isTaskHigher ? '-' : ''}${cellHeight / 2} h ${taskStartX - depEndX - 20}`
                 }
-                v ${cellHeight * (t.rowIndex - tD.rowIndex) + ((isTaskHigher ? 1 : -1) * cellHeight) / 2}
+                v ${cellHeight * (t.rowIndex - value.rowIndex) + ((isTaskHigher ? 1 : -1) * cellHeight) / 2}
                 h 10 `
               }
             />
