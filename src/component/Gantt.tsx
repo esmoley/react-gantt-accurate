@@ -22,7 +22,7 @@ type Row = {
 }
 
 type GanntProps = {
-  rows: Row[]
+  rows?: Row[]
   locale?: Locale
   theme?: 'light' | 'dark'
   viewMode?: 'days' | 'hours' | 'minutes' | 'seconds' | 'milliseconds'
@@ -148,7 +148,7 @@ const TaskTooltip = ({ top, show, content, taskX, taskWidth, hideTooltip }: Task
   )
 }
 export const Gantt = ({
-  rows,
+  rows = [],
   locale = 'en',
   theme = 'light',
   viewMode = 'days',

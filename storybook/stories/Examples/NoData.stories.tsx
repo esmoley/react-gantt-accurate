@@ -7,6 +7,14 @@ export default {
   tags: ['autodocs'],
 }
 
+export const Default = {
+  render: () => {
+    return <Gantt />
+  },
+  args: {},
+  argTypes: {},
+}
+
 export const En = {
   render: () => {
     return <Gantt rows={[]} locale='en' />
