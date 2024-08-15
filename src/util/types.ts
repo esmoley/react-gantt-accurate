@@ -1,1 +1,37 @@
-export type Locale = 'en' | 'ru'
+export type LocaleType = 'en' | 'ru'
+
+export type TaskDateType = Date | number
+
+export type DependencyTask = {
+  id: string
+  onClick?: () => void
+}
+
+export type Task = {
+  id: string
+  start: TaskDateType
+  end: TaskDateType
+  color?: string
+  dependencies?: string[] | DependencyTask[]
+  tooltip?: string | JSX.Element
+  onClick?: () => void
+}
+export type Row = {
+  name: string
+  tasks: Task[]
+}
+
+export type TaskGraph = {
+  rowIndex: number
+  index: number
+  task: Task
+  start: number
+  end: number
+  dependencies: TaskGraphDependency[]
+}
+
+export type TaskGraphDependency = TaskGraph & {
+  dependencyObj: DependencyTask
+}
+
+export type ViewModeType = 'days' | 'hours' | 'minutes' | 'seconds' | 'milliseconds'

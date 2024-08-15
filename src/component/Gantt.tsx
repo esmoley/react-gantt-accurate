@@ -1,151 +1,18 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { getDayOfWeek, getNoDataText } from '../util/ganttUtils'
-import { Locale } from '../util/types'
+import React, { useState } from 'react'
+import { getNoDataText } from '../util/ganttUtils'
+import { DependencyTask, LocaleType, Row, TaskGraph, ViewModeType } from '../util/types'
 import './styles.css'
-type TaskDate = Date | number
-type DependencyTask = {
-  id: string
-  onClick?: () => void
-}
-type Task = {
-  id: string
-  start: TaskDate
-  end: TaskDate
-  color?: string
-  dependencies?: string[] | DependencyTask[]
-  tooltip?: string | JSX.Element
-  onClick?: () => void
-}
-type Row = {
-  name: string
-  tasks: Task[]
-}
+import { CELL_HEIGHT, DAY_MS, HOUR_MS, MILLISECOND_MS, MINUTE_MS, SECOND_MS } from '../util/consts'
+import { TimeGrid } from './TimeGrid'
+import { TaskTooltip, TaskTooltipProps } from './TaskTooltip'
 
 type GanntProps = {
   rows?: Row[]
-  locale?: Locale
+  locale?: LocaleType
   theme?: 'light' | 'dark'
-  viewMode?: 'days' | 'hours' | 'minutes' | 'seconds' | 'milliseconds'
+  viewMode?: ViewModeType
   namesPanelWidth?: number
   namesPanelTextAlign?: React.CSSProperties['textAlign']
-}
-type TaskGraphDependency = TaskGraph & {
-  dependencyObj: DependencyTask
-}
-type TaskGraph = {
-  rowIndex: number
-  index: number
-  task: Task
-  start: number
-  end: number
-  dependencies: TaskGraphDependency[]
-}
-const cellWidth = 30
-const cellHeight = 40
-const leftPadding = 15
-const millisecondMs = 1
-const secondMs = 1000
-const minuteMs = 60 * 1000
-const hourMs = 60 * 60 * 1000
-const dayMs = 24 * 60 * 60 * 1000 // hours*minutes*seconds*milliseconds
-const timePeriodHeight = cellHeight - 14
-
-type TaskTooltipProps = {
-  id: string
-  top: number
-  show: boolean
-  hideTooltip?: () => void
-  content: string | JSX.Element
-  taskX: number
-  taskWidth: number
-}
-const screenPadding = 15
-const TaskTooltip = ({ top, show, content, taskX, taskWidth, hideTooltip }: TaskTooltipProps) => {
-  const tooltipChildRef = useRef<HTMLDivElement>(null)
-
-  const taskEndX = taskX + taskWidth
-  const tooltipRightToTaskX = screenPadding + taskEndX
-  const [left, setLeft] = useState<React.CSSProperties['left']>(tooltipRightToTaskX)
-  const [right, setRight] = useState<React.CSSProperties['right']>(null)
-  const [innerLeft, setInnerLeft] = useState<React.CSSProperties['left']>('50%')
-  const [innerRight, setInnerRight] = useState<React.CSSProperties['left']>(null)
-  const [topUpdated, setTopUpdated] = useState<React.CSSProperties['top']>(top)
-  const [step, setStep] = useState<'Initial' | 'UpdateOrientation' | 'SetTop' | 'SetBottom' | 'Done'>('Initial')
-  const windowWidthScrolled = window.scrollX + window.innerWidth
-
-  useEffect(() => {
-    if (!show || !tooltipChildRef.current) {
-      setStep('Initial')
-      return
-    }
-    if (step != 'Initial') return
-
-    const rectChild = tooltipChildRef.current.getBoundingClientRect()
-    if (!rectChild) return
-    setLeft(tooltipRightToTaskX)
-    setRight(null)
-    setInnerLeft('50%')
-    setInnerRight(null)
-    setStep('UpdateOrientation')
-    setTopUpdated(top)
-  }, [show, tooltipRightToTaskX, top, step])
-
-  useEffect(() => {
-    if (!show || !tooltipChildRef.current || step !== 'UpdateOrientation') return
-    const rectChild = tooltipChildRef.current.getBoundingClientRect()
-    if (!rectChild) return
-    const tooltipActualWidth = rectChild.width
-    const tooltipRightX = tooltipRightToTaskX + tooltipActualWidth
-    if (tooltipActualWidth + screenPadding * 2 >= windowWidthScrolled) {
-      // is wider than screen
-      setLeft(0)
-      setRight(0)
-      setInnerLeft(0)
-      setInnerRight(0)
-    } else if (tooltipRightX > windowWidthScrolled) {
-      // is right oriented
-      setLeft('auto')
-      setRight(screenPadding)
-      setInnerLeft(null)
-      setInnerRight('50%')
-    }
-    setTopUpdated(top)
-    setStep('SetTop')
-  }, [step, show, tooltipRightToTaskX, top, windowWidthScrolled])
-
-  useEffect(() => {
-    if (!show || !tooltipChildRef.current || step !== 'SetTop') return
-    const rectChild = tooltipChildRef.current.getBoundingClientRect()
-    if (!rectChild) return
-    if (rectChild.top < 0) {
-      setTopUpdated(top + -rectChild.top + screenPadding)
-    }
-    setStep('Done')
-  }, [step, show, top])
-
-  if (!show) return <></>
-
-  return (
-    <div
-      style={{ left, right, top: topUpdated, position: 'absolute', opacity: step === 'Done' ? 1 : 0 }}
-      onMouseLeave={hideTooltip}
-    >
-      <div
-        style={{
-          border: '1px solid black',
-          color: 'black',
-          background: '#fff',
-          transform: 'translateY(-50%)',
-          zIndex: 2,
-          left: innerLeft,
-          right: innerRight,
-        }}
-        ref={tooltipChildRef}
-      >
-        {content}
-      </div>
-    </div>
-  )
 }
 export const Gantt = ({
   rows = [],
@@ -165,14 +32,14 @@ export const Gantt = ({
   })
   const cellMs =
     viewMode === 'hours'
-      ? hourMs
+      ? HOUR_MS
       : viewMode === 'minutes'
-      ? minuteMs
+      ? MINUTE_MS
       : viewMode === 'seconds'
-      ? secondMs
+      ? SECOND_MS
       : viewMode === 'milliseconds'
-      ? millisecondMs
-      : dayMs
+      ? MILLISECOND_MS
+      : DAY_MS
   const taskGraphMap: Map<string, TaskGraph> = rows?.reduce((accRows, row, rowIndex) => {
     return row.tasks.reduce((acc, task, index) => {
       return acc.set(task.id, {
@@ -319,368 +186,16 @@ export const Gantt = ({
         )
       : new Date(highestTaskEndDate.getFullYear(), highestTaskEndDate.getMonth() + 1, 1, 0, 0, 0, 0)
   //#endregion endDate
-  const DaysRow = ({ y }: { y: number }) => {
-    const res = []
-    const day = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 0, 0, 0, 0)
-    let curX = leftPadding
 
-    const dayDiff = startDate.getTime() - day.getTime()
-    if (dayDiff > 0) {
-      curX += ((dayMs - dayDiff) / cellMs) * cellWidth
-      day.setDate(day.getDate() + 1)
-    }
-    while (day.getTime() < endDate.getTime()) {
-      res.push(
-        <text key={day.valueOf()} y={y} x={curX} className='days-row'>
-          {day.getDate()}
-        </text>,
-      )
-      curX += (dayMs / cellMs) * cellWidth
-      day.setDate(day.getDate() + 1)
-    }
-    return <g>{res}</g>
-  }
-  const DaysOfTheWeekRow = ({ y }: { y: number }) => {
-    const res = []
-    const day = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 0, 0, 0, 0)
-    let curX = leftPadding
-
-    const dayDiff = startDate.getTime() - day.getTime()
-    if (dayDiff > 0) {
-      curX += ((dayMs - dayDiff) / cellMs) * cellWidth
-      day.setDate(day.getDate() + 1)
-    }
-    while (day.getTime() < endDate.getTime()) {
-      const dayOfTheWeek = getDayOfWeek(day, locale)
-      res.push(
-        <text key={day.valueOf()} y={y} x={curX} className='days-row'>
-          {dayOfTheWeek}
-        </text>,
-      )
-      curX += (dayMs / cellMs) * cellWidth
-      day.setDate(day.getDate() + 1)
-    }
-    return <g>{res}</g>
-  }
-  const HoursRow = ({ y }: { y: number }) => {
-    const res = []
-    const hour = new Date(
-      startDate.getFullYear(),
-      startDate.getMonth(),
-      startDate.getDate(),
-      startDate.getHours(),
-      0,
-      0,
-      0,
-    )
-    let curX = leftPadding
-
-    const hoursDiff = startDate.getTime() - hour.getTime()
-    if (hoursDiff > 0) {
-      curX += ((hourMs - hoursDiff) / cellMs) * cellWidth
-      hour.setHours(hour.getHours() + 1)
-    }
-
-    while (hour.getTime() < endDate.getTime()) {
-      res.push(
-        <text key={hour.valueOf()} y={y} x={curX} className='days-row'>
-          {hour.getHours()}
-        </text>,
-      )
-      curX += (hourMs / cellMs) * cellWidth
-      hour.setHours(hour.getHours() + 1)
-    }
-    return <g>{res}</g>
-  }
-  const MinutesRow = ({ y }: { y: number }) => {
-    const res = []
-    const minute = new Date(
-      startDate.getFullYear(),
-      startDate.getMonth(),
-      startDate.getDate(),
-      startDate.getHours(),
-      startDate.getMinutes(),
-      0,
-      0,
-    )
-    let curX = leftPadding
-
-    const minutesDiff = startDate.getTime() - minute.getTime()
-    if (minutesDiff > 0) {
-      curX += ((minuteMs - minutesDiff) / cellMs) * cellWidth
-      minute.setMinutes(minute.getMinutes() + 1)
-    }
-    while (minute.getTime() < endDate.getTime()) {
-      res.push(
-        <text key={minute.valueOf()} y={y} x={curX} className='days-row'>
-          {minute.getMinutes()}
-        </text>,
-      )
-      curX += (minuteMs / cellMs) * cellWidth
-      minute.setMinutes(minute.getMinutes() + 1)
-    }
-    return <g>{res}</g>
-  }
-  const SecondsRow = ({ y }: { y: number }) => {
-    const res = []
-    const second = new Date(
-      startDate.getFullYear(),
-      startDate.getMonth(),
-      startDate.getDate(),
-      startDate.getHours(),
-      startDate.getMinutes(),
-      startDate.getSeconds(),
-      0,
-    )
-    let curX = leftPadding
-
-    const secondDiff = startDate.getTime() - second.getTime()
-    if (secondDiff > 0) {
-      curX += ((secondMs - secondDiff) / cellMs) * cellWidth
-      second.setSeconds(second.getSeconds() + 1)
-    }
-    while (second.getTime() < endDate.getTime()) {
-      res.push(
-        <text key={second.valueOf()} y={y} x={curX} className='days-row'>
-          {second.getSeconds()}
-        </text>,
-      )
-      curX += (secondMs / cellMs) * cellWidth
-      second.setSeconds(second.getSeconds() + 1)
-    }
-    return <g>{res}</g>
-  }
-  const MillisecondsRow = ({ y }: { y: number }) => {
-    const millisecond = new Date(startDate)
-    const res = []
-    let curX = leftPadding
-    while (millisecond.getTime() < endDate.getTime()) {
-      res.push(
-        <text key={millisecond.valueOf()} y={y} x={curX} className='days-row'>
-          {millisecond.getMilliseconds()}
-        </text>,
-      )
-      curX += (millisecondMs / cellMs) * cellWidth
-      millisecond.setMilliseconds(millisecond.getMilliseconds() + 1)
-    }
-    return <g>{res}</g>
-  }
-  const Dependencies = ({ y }: { y: number }) => {
-    return taskGraphArr.map((t) => {
-      if (t.dependencies.length === 0) return null
-      return t.dependencies.map((dependencyTask) => {
-        const value = dependencyTask
-        const taskStartX = ((t.start - startDate.getTime()) / cellMs) * cellWidth
-        const taskEndX = ((t.start - startDate.getTime() + t.end - t.start) / cellMs) * cellWidth
-        const taskY = y + t.rowIndex * cellHeight + cellHeight / 2
-
-        const depStartX = ((value.start - startDate.getTime()) / cellMs) * cellWidth
-        const depEndX = ((value.start - startDate.getTime() + value.end - value.start) / cellMs) * cellWidth
-        const depY = y + value.rowIndex * cellHeight + cellHeight / 2
-        const isTaskHigher = t.rowIndex < value.rowIndex
-        const isSameRow = t.rowIndex === value.rowIndex
-        const onClick = dependencyTask.dependencyObj?.onClick
-        return (
-          <g key={t.task.id} className={`arrow${onClick ? ' onclick' : ''}`} onClick={onClick}>
-            <path
-              fill='none'
-              strokeWidth={1.5}
-              d={
-                isSameRow
-                  ? taskStartX > depEndX
-                    ? `M ${depEndX} ${depY} h ${taskStartX - depEndX}`
-                    : `M ${taskEndX} ${depY} h ${depStartX - taskEndX}`
-                  : `M ${depEndX} ${depY} 
-                h 10
-                ${
-                  taskStartX - depEndX - 20 > 0
-                    ? `h ${taskStartX - depEndX - 20} v ${isTaskHigher ? '-' : ''}${cellHeight / 2}`
-                    : `v ${isTaskHigher ? '-' : ''}${cellHeight / 2} h ${taskStartX - depEndX - 20}`
-                }
-                v ${cellHeight * (t.rowIndex - value.rowIndex) + ((isTaskHigher ? 1 : -1) * cellHeight) / 2}
-                h 10 `
-              }
-            />
-            <polygon
-              points={
-                isSameRow && taskStartX <= depEndX
-                  ? `${taskEndX},${taskY}
-								${taskEndX + 5},${taskY - 5}
-								${taskEndX + 5},${taskY + 5}`
-                  : `${taskStartX},${taskY}
-								${taskStartX - 5},${taskY - 5}
-								${taskStartX - 5},${taskY + 5}`
-              }
-            />
-          </g>
-        )
-      })
-    })
-  }
-  const hideTooltip = () => {
-    setTaskTooltipProps({ id: '', top: 0, show: false, content: null, taskX: 0, taskWidth: 0, hideTooltip })
-  }
-
-  const TaskRowsTimePeriods = ({ y }: { y: number }) => {
-    return (
-      <g>
-        {taskGraphArr.map((t) => {
-          const x = ((t.start - startDate.getTime()) / cellMs) * cellWidth
-          const width = ((t.end - t.start) / cellMs) * cellWidth
-          const curY = y + t.rowIndex * cellHeight + 7
-          return (
-            <rect
-              key={`${t.task.id}`}
-              fill={t?.task.color ?? '#91bbfe'}
-              x={x}
-              y={curY}
-              width={width}
-              height={timePeriodHeight}
-              ry={3}
-              rx={3}
-              style={{
-                cursor: t.task.tooltip || t.task.onClick ? 'pointer' : 'default',
-              }}
-              className={`task-rect${t.task.onClick ? ' onclick' : ''}`}
-              onMouseOverCapture={() => {
-                if (!t.task.tooltip || (taskTooltipProps.show && taskTooltipProps.id === t.task.id)) return
-                const upd = {
-                  id: t.task.id,
-                  top: curY + timePeriodHeight / 2,
-                  show: true,
-                  content: t.task.tooltip,
-                  taskX: namesPanelWidth + x,
-                  taskWidth: width,
-                  hideTooltip,
-                }
-                setTaskTooltipProps(upd)
-              }}
-              onMouseOutCapture={hideTooltip}
-              onClick={t.task.onClick}
-            />
-          )
-        })}
-      </g>
-    )
-  }
-  const RowLines = ({ y, width, spaceY, amount }: { y: number; width: number; spaceY: number; amount: number }) => {
-    const res = []
-    for (let i = 0; i < amount; i++) {
-      res.push(<line key={i} x={0} y1={y + spaceY * i} x2={width} y2={y + spaceY * i} />)
-    }
-    return <g className='cell-line'>{res}</g>
-  }
-  const ColumnLines = ({
-    x,
-    y,
-    height,
-    spaceX,
-    amount,
-  }: {
-    x: number
-    y: number
-    height: number
-    spaceX: number
-    amount: number
-  }) => {
-    const res = []
-    for (let i = 0; i < amount; i++) {
-      res.push(<line key={i} x1={i * spaceX + x} y1={y} x2={i * spaceX + x} y2={height} />)
-    }
-    return <g className='cell-line'>{res}</g>
-  }
-  const Cells = ({ y }: { y: number }) => {
-    const res = []
-    let currentCellMs = startDate.getTime()
-    let curX = 0
-    while (currentCellMs < endDate.getTime() + cellMs) {
-      const currentDate = new Date(currentCellMs)
-      res.push(
-        <rect
-          key={currentCellMs}
-          x={curX}
-          y={y}
-          width={cellWidth}
-          height={cellHeight * rows.length}
-          className={
-            (viewMode === 'days' && getDayOfWeek(currentDate) === 'S') ||
-            (viewMode === 'hours' && currentDate.getHours() >= 12)
-              ? 'cell-rect-secondary'
-              : 'cell-rect-primary'
-          }
-        />,
-      )
-      curX += cellWidth
-      currentCellMs += cellMs
-    }
-    return <g>{res}</g>
-  }
-  const TimeGrid = () => {
-    const columnsCount = (endDate.getTime() - startDate.getTime()) / cellMs
-    const timeLineWidth = cellWidth * columnsCount
-    const timeGridHeight = cellHeight * rows.length + 10
-    return (
-      <div style={{ overflowX: 'auto' }}>
-        <svg width={timeLineWidth + leftPadding / 2} height={timeGridHeight + cellHeight}>
-          {viewMode === 'days' && (
-            <>
-              <DaysRow y={cellHeight / 2} />
-              <DaysOfTheWeekRow y={cellHeight} />
-            </>
-          )}
-          {viewMode === 'hours' && (
-            <>
-              <DaysRow y={cellHeight / 2} />
-              <HoursRow y={cellHeight} />
-            </>
-          )}
-          {viewMode === 'minutes' && (
-            <>
-              <HoursRow y={cellHeight / 2} />
-              <MinutesRow y={cellHeight} />
-            </>
-          )}
-          {viewMode === 'seconds' && (
-            <>
-              <MinutesRow y={cellHeight / 2} />
-              <SecondsRow y={cellHeight} />
-            </>
-          )}
-          {viewMode === 'milliseconds' && (
-            <>
-              <SecondsRow y={cellHeight / 2} />
-              <MillisecondsRow y={cellHeight} />
-            </>
-          )}
-          <Cells y={cellHeight + 10} />
-          <RowLines
-            y={cellHeight + 10}
-            amount={rows.length + 1}
-            spaceY={cellHeight}
-            width={timeLineWidth + leftPadding}
-          />
-          <ColumnLines
-            x={0}
-            y={cellHeight + 10}
-            amount={columnsCount + 1}
-            spaceX={cellWidth}
-            height={timeGridHeight + cellHeight}
-          />
-          <Dependencies y={cellHeight + 10} />
-          <TaskRowsTimePeriods y={cellHeight + 10} />
-        </svg>
-      </div>
-    )
-  }
   return (
     <div className={`react-gantt-accurate ${theme}`} style={{ position: 'relative' }}>
       <div className='gantt-grid-container' style={{ gridTemplateColumns: `${namesPanelWidth}px 1fr` }}>
         {rows.length ? (
           <>
             <div className='gantt-grid-container__tasks'>
-              <div className='gantt-task-row-top' style={{ marginTop: `${cellHeight + 9}px` }}></div>
+              <div className='gantt-task-row-top' style={{ marginTop: `${CELL_HEIGHT + 9}px` }}></div>
               {rows.map((row, index) => (
-                <div key={index} className='gantt-task-row' style={{ height: `${cellHeight}px` }}>
+                <div key={index} className='gantt-task-row' style={{ height: `${CELL_HEIGHT}px` }}>
                   <div
                     style={{
                       maxWidth: `${namesPanelWidth}px`,
@@ -698,7 +213,18 @@ export const Gantt = ({
                 </div>
               ))}
             </div>
-            <TimeGrid />
+            <TimeGrid
+              rows={rows}
+              startDate={startDate}
+              endDate={endDate}
+              cellMs={cellMs}
+              viewMode={viewMode}
+              locale={locale}
+              taskGraphArr={taskGraphArr}
+              taskTooltipProps={taskTooltipProps}
+              setTaskTooltipProps={setTaskTooltipProps}
+              namesPanelWidth={namesPanelWidth}
+            />
           </>
         ) : (
           <div className='gantt-no-data'>{getNoDataText(locale)}</div>
