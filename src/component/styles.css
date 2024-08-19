@@ -52,7 +52,6 @@
     fill:#fff;
   }
   .task-rect{
-    fill:#91bbfe;
     filter: none;
     &.onclick:hover{
       filter: brightness(95%);
