@@ -1,6 +1,6 @@
 {
   "name": "react-gantt-accurate",
-  "version": "1.8.2",
+  "version": "1.8.3",
   "main": "./lib/cjs/index.js",
   "module": "./lib/esm/index.js",
   "types": "./lib/esm/index.d.ts",
