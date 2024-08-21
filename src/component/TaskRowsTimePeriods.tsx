@@ -1,16 +1,22 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { CELL_HEIGHT, CELL_WIDTH, TIME_PERIOD_HEIGHT } from '../util/consts'
 import { TaskGraph } from '../util/types'
-import { TaskTooltipProps } from './TaskTooltip'
 
 type TaskRowsTimePeriodsProps = {
   y: number
   taskGraphArr: TaskGraph[]
   startDate: Date
   cellMs: number
-  taskTooltipProps: TaskTooltipProps
-  setTaskTooltipProps: React.Dispatch<React.SetStateAction<TaskTooltipProps>>
   namesPanelWidth: number
+  taskTooltipId: string
+  setTaskTooltipId: React.Dispatch<React.SetStateAction<string>>
+  setTaskTooltipTop: React.Dispatch<React.SetStateAction<number>>
+  taskTooltipShow: boolean
+  setTaskTooltipShow: React.Dispatch<React.SetStateAction<boolean>>
+  taskTooltipMouseOver: boolean
+  setTaskTooltipContent: React.Dispatch<React.SetStateAction<string | JSX.Element>>
+  setTaskTooltipTaskX: React.Dispatch<React.SetStateAction<number>>
+  setTaskTooltipTaskWidth: React.Dispatch<React.SetStateAction<number>>
 }
 
 export const TaskRowsTimePeriods = ({
@@ -18,14 +24,23 @@ export const TaskRowsTimePeriods = ({
   taskGraphArr,
   startDate,
   cellMs,
-  taskTooltipProps,
-  setTaskTooltipProps,
   namesPanelWidth,
+  taskTooltipId,
+  setTaskTooltipId,
+  setTaskTooltipTop,
+  taskTooltipShow,
+  setTaskTooltipShow,
+  taskTooltipMouseOver,
+  setTaskTooltipContent,
+  setTaskTooltipTaskX,
+  setTaskTooltipTaskWidth,
 }: TaskRowsTimePeriodsProps) => {
-  const hideTooltip = () => {
-    setTaskTooltipProps({ id: '', top: 0, show: false, content: null, taskX: 0, taskWidth: 0, hideTooltip })
-  }
-
+  const [mouseOverTask, setMouseOverTask] = useState<TaskGraph>(null)
+  useEffect(() => {
+    if (taskTooltipShow && !mouseOverTask && !taskTooltipMouseOver) {
+      setTaskTooltipShow(false)
+    }
+  }, [taskTooltipMouseOver, mouseOverTask, taskTooltipShow, setTaskTooltipShow])
   return (
     <g>
       {taskGraphArr.map((t) => {
@@ -46,20 +61,19 @@ export const TaskRowsTimePeriods = ({
               cursor: t.task.tooltip || t.task.onClick ? 'pointer' : 'default',
             }}
             className={`task-rect${t.task.onClick ? ' onclick' : ''}`}
-            onMouseOverCapture={() => {
-              if (!t.task.tooltip || (taskTooltipProps.show && taskTooltipProps.id === t.task.id)) return
-              const upd = {
-                id: t.task.id,
-                top: curY + TIME_PERIOD_HEIGHT / 2,
-                show: true,
-                content: t.task.tooltip,
-                taskX: namesPanelWidth + x,
-                taskWidth: width,
-                hideTooltip,
-              }
-              setTaskTooltipProps(upd)
+            onPointerEnter={() => {
+              if (!t.task.tooltip || (taskTooltipShow && taskTooltipId === t.task.id)) return
+              setTaskTooltipId(t.task.id)
+              setTaskTooltipTop(curY + TIME_PERIOD_HEIGHT / 2)
+              setTaskTooltipShow(true)
+              setTaskTooltipContent(t.task.tooltip)
+              setTaskTooltipTaskX(namesPanelWidth + x)
+              setTaskTooltipTaskWidth(width)
+              setMouseOverTask(t)
             }}
-            onMouseOutCapture={hideTooltip}
+            onPointerLeave={() => {
+              setMouseOverTask(null)
+            }}
             onClick={t.task.onClick}
           />
         )

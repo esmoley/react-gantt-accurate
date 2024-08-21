@@ -3,15 +3,35 @@ import { SCREEN_PADDING } from '../util/consts'
 import React from 'react'
 
 export type TaskTooltipProps = {
-  id: string
   top: number
   show: boolean
-  hideTooltip?: () => void
   content: string | JSX.Element
   taskX: number
   taskWidth: number
+  mouseOver: boolean
+  setMouseOver: React.Dispatch<React.SetStateAction<boolean>>
+  setTaskTooltipId: React.Dispatch<React.SetStateAction<string>>
+  setTaskTooltipTop: React.Dispatch<React.SetStateAction<number>>
+  setTaskTooltipShow: React.Dispatch<React.SetStateAction<boolean>>
+  setTaskTooltipContent: React.Dispatch<React.SetStateAction<string | JSX.Element>>
+  setTaskTooltipTaskX: React.Dispatch<React.SetStateAction<number>>
+  setTaskTooltipTaskWidth: React.Dispatch<React.SetStateAction<number>>
 }
-export const TaskTooltip = ({ top, show, content, taskX, taskWidth, hideTooltip }: TaskTooltipProps) => {
+export const TaskTooltip = ({
+  top,
+  show,
+  content,
+  taskX,
+  taskWidth,
+  mouseOver,
+  setMouseOver,
+  setTaskTooltipId,
+  setTaskTooltipTop,
+  setTaskTooltipShow,
+  setTaskTooltipContent,
+  setTaskTooltipTaskX,
+  setTaskTooltipTaskWidth,
+}: TaskTooltipProps) => {
   const tooltipChildRef = useRef<HTMLDivElement>(null)
 
   const taskEndX = taskX + taskWidth
@@ -24,6 +44,25 @@ export const TaskTooltip = ({ top, show, content, taskX, taskWidth, hideTooltip 
   const [step, setStep] = useState<'Initial' | 'UpdateOrientation' | 'SetTop' | 'SetBottom' | 'Done'>('Initial')
   const windowWidthScrolled = window.scrollX + window.innerWidth
 
+  // reset
+  useEffect(() => {
+    if (!show) {
+      setTaskTooltipId('')
+      setTaskTooltipTop(150)
+      setTaskTooltipShow(false)
+      setTaskTooltipContent(null)
+      setTaskTooltipTaskX(0)
+      setTaskTooltipTaskWidth(0)
+    }
+  }, [
+    show,
+    setTaskTooltipId,
+    setTaskTooltipTop,
+    setTaskTooltipShow,
+    setTaskTooltipContent,
+    setTaskTooltipTaskX,
+    setTaskTooltipTaskWidth,
+  ])
   useEffect(() => {
     if (!show || !tooltipChildRef.current) {
       setStep('Initial')
@@ -73,13 +112,12 @@ export const TaskTooltip = ({ top, show, content, taskX, taskWidth, hideTooltip 
     }
     setStep('Done')
   }, [step, show, top])
-
   if (!show) return <></>
-
   return (
     <div
       style={{ left, right, top: topUpdated, position: 'absolute', opacity: step === 'Done' ? 1 : 0 }}
-      onMouseLeave={hideTooltip}
+      onPointerEnter={() => !mouseOver && setMouseOver(true)}
+      onPointerLeave={() => mouseOver && setMouseOver(false)}
     >
       <div
         style={{

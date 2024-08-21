@@ -4,7 +4,7 @@ import { DependencyTask, LocaleType, Row, TaskGraph, ViewModeType } from '../uti
 import './styles.css'
 import { CELL_HEIGHT, DAY_MS, HOUR_MS, MILLISECOND_MS, MINUTE_MS, SECOND_MS } from '../util/consts'
 import { TimeGrid } from './TimeGrid'
-import { TaskTooltip, TaskTooltipProps } from './TaskTooltip'
+import { TaskTooltip } from './TaskTooltip'
 
 type GanntProps = {
   rows?: Row[]
@@ -22,14 +22,14 @@ export const Gantt = ({
   namesPanelWidth = 150,
   namesPanelTextAlign = 'center',
 }: GanntProps) => {
-  const [taskTooltipProps, setTaskTooltipProps] = useState<TaskTooltipProps>({
-    id: '',
-    top: 150,
-    show: false,
-    content: null,
-    taskX: 0,
-    taskWidth: 0,
-  })
+  const [taskTooltipId, setTaskTooltipId] = useState('')
+  const [taskTooltipTop, setTaskTooltipTop] = useState(150)
+  const [taskTooltipShow, setTaskTooltipShow] = useState(false)
+  const [taskTooltipContent, setTaskTooltipContent] = useState<string | JSX.Element>(null)
+  const [taskTooltipTaskX, setTaskTooltipTaskX] = useState<number>(0)
+  const [taskTooltipTaskWidth, setTaskTooltipTaskWidth] = useState<number>(0)
+  const [taskTooltipMouseOver, setTaskTooltipMouseOver] = useState<boolean>(false)
+
   const cellMs =
     viewMode === 'hours'
       ? HOUR_MS
@@ -221,16 +221,37 @@ export const Gantt = ({
               viewMode={viewMode}
               locale={locale}
               taskGraphArr={taskGraphArr}
-              taskTooltipProps={taskTooltipProps}
-              setTaskTooltipProps={setTaskTooltipProps}
               namesPanelWidth={namesPanelWidth}
+              taskTooltipId={taskTooltipId}
+              setTaskTooltipId={setTaskTooltipId}
+              setTaskTooltipTop={setTaskTooltipTop}
+              taskTooltipShow={taskTooltipShow}
+              setTaskTooltipShow={setTaskTooltipShow}
+              taskTooltipMouseOver={taskTooltipMouseOver}
+              setTaskTooltipContent={setTaskTooltipContent}
+              setTaskTooltipTaskX={setTaskTooltipTaskX}
+              setTaskTooltipTaskWidth={setTaskTooltipTaskWidth}
             />
           </>
         ) : (
           <div className='gantt-no-data'>{getNoDataText(locale)}</div>
         )}
       </div>
-      <TaskTooltip {...taskTooltipProps} />
+      <TaskTooltip
+        content={taskTooltipContent}
+        mouseOver={taskTooltipMouseOver}
+        setMouseOver={setTaskTooltipMouseOver}
+        show={taskTooltipShow}
+        taskWidth={taskTooltipTaskWidth}
+        taskX={taskTooltipTaskX}
+        top={taskTooltipTop}
+        setTaskTooltipId={setTaskTooltipId}
+        setTaskTooltipTop={setTaskTooltipTop}
+        setTaskTooltipShow={setTaskTooltipShow}
+        setTaskTooltipContent={setTaskTooltipContent}
+        setTaskTooltipTaskX={setTaskTooltipTaskX}
+        setTaskTooltipTaskWidth={setTaskTooltipTaskWidth}
+      />
     </div>
   )
 }

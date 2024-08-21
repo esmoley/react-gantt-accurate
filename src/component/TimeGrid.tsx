@@ -12,7 +12,6 @@ import { RowLines } from './RowLines'
 import { ColumnLines } from './ColumnLines'
 import { Dependencies } from './Dependencies'
 import { TaskRowsTimePeriods } from './TaskRowsTimePeriods'
-import { TaskTooltipProps } from './TaskTooltip'
 
 type TimeGridProps = {
   rows: Row[]
@@ -22,9 +21,16 @@ type TimeGridProps = {
   viewMode: ViewModeType
   locale: LocaleType
   taskGraphArr: TaskGraph[]
-  taskTooltipProps: TaskTooltipProps
-  setTaskTooltipProps: React.Dispatch<React.SetStateAction<TaskTooltipProps>>
   namesPanelWidth: number
+  taskTooltipId: string
+  setTaskTooltipId: React.Dispatch<React.SetStateAction<string>>
+  setTaskTooltipTop: React.Dispatch<React.SetStateAction<number>>
+  taskTooltipShow: boolean
+  setTaskTooltipShow: React.Dispatch<React.SetStateAction<boolean>>
+  taskTooltipMouseOver: boolean
+  setTaskTooltipContent: React.Dispatch<React.SetStateAction<string | JSX.Element>>
+  setTaskTooltipTaskX: React.Dispatch<React.SetStateAction<number>>
+  setTaskTooltipTaskWidth: React.Dispatch<React.SetStateAction<number>>
 }
 export const TimeGrid = ({
   rows,
@@ -34,9 +40,16 @@ export const TimeGrid = ({
   viewMode,
   locale,
   taskGraphArr,
-  taskTooltipProps,
-  setTaskTooltipProps,
   namesPanelWidth,
+  taskTooltipId,
+  setTaskTooltipId,
+  setTaskTooltipTop,
+  taskTooltipShow,
+  setTaskTooltipShow,
+  taskTooltipMouseOver,
+  setTaskTooltipContent,
+  setTaskTooltipTaskX,
+  setTaskTooltipTaskWidth,
 }: TimeGridProps) => {
   const columnsCount = (endDate.getTime() - startDate.getTime()) / cellMs
   const timeLineWidth = CELL_WIDTH * columnsCount
@@ -101,9 +114,16 @@ export const TimeGrid = ({
           taskGraphArr={taskGraphArr}
           startDate={startDate}
           cellMs={cellMs}
-          taskTooltipProps={taskTooltipProps}
-          setTaskTooltipProps={setTaskTooltipProps}
           namesPanelWidth={namesPanelWidth}
+          taskTooltipId={taskTooltipId}
+          setTaskTooltipId={setTaskTooltipId}
+          setTaskTooltipTop={setTaskTooltipTop}
+          taskTooltipShow={taskTooltipShow}
+          setTaskTooltipShow={setTaskTooltipShow}
+          taskTooltipMouseOver={taskTooltipMouseOver}
+          setTaskTooltipContent={setTaskTooltipContent}
+          setTaskTooltipTaskX={setTaskTooltipTaskX}
+          setTaskTooltipTaskWidth={setTaskTooltipTaskWidth}
         />
       </svg>
     </div>
