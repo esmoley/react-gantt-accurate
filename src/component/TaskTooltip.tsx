@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { SCREEN_PADDING } from '../util/consts'
+import { CELL_HEIGHT, SCREEN_PADDING } from '../util/consts'
 import React from 'react'
 
 export type TaskTooltipProps = {
@@ -77,7 +77,7 @@ export const TaskTooltip = ({
     setInnerLeft('50%')
     setInnerRight(null)
     setStep('UpdateOrientation')
-    setTopUpdated(top)
+    setTopUpdated(top + CELL_HEIGHT / 2)
   }, [show, tooltipRightToTaskX, top, step])
 
   useEffect(() => {
@@ -92,14 +92,15 @@ export const TaskTooltip = ({
       setRight(0)
       setInnerLeft(0)
       setInnerRight(0)
+      setTopUpdated(top)
     } else if (tooltipRightX > windowWidthScrolled) {
       // is right oriented
       setLeft('auto')
       setRight(SCREEN_PADDING)
       setInnerLeft(null)
       setInnerRight('50%')
+      setTopUpdated(top + CELL_HEIGHT / 2)
     }
-    setTopUpdated(top)
     setStep('SetTop')
   }, [step, show, tooltipRightToTaskX, top, windowWidthScrolled])
 
@@ -112,6 +113,7 @@ export const TaskTooltip = ({
     }
     setStep('Done')
   }, [step, show, top])
+
   if (!show) return <></>
   return (
     <div
