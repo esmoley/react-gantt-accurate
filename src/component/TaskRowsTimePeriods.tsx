@@ -53,7 +53,7 @@ export const TaskRowsTimePeriods = ({
             fill={t?.task.color ?? '#91bbfe'}
             x={x}
             y={curY}
-            width={width}
+            width={width >= 6 ? width : 6}
             height={TIME_PERIOD_HEIGHT}
             ry={3}
             rx={3}

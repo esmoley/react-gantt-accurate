@@ -123,3 +123,24 @@ export const DependencyLower = {
   args: {},
   argTypes: {},
 }
+
+export const SmallestTask = {
+  render: () => {
+    const rows = [
+      {
+        name: '>> Task 1',
+        tasks: [
+          {
+            start: 0,
+            end: 0,
+            id: '1',
+            tooltip: '>> Task 1',
+          },
+        ],
+      },
+    ]
+    return <Gantt rows={rows} theme='light' viewMode='seconds' />
+  },
+  args: {},
+  argTypes: {},
+}
