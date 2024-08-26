@@ -30,6 +30,11 @@ export type TaskGraph = {
   dependencies: TaskGraphDependency[]
 }
 
+export type TaskGraphRowPos = {
+  x: number
+  width: number
+}
+
 export type TaskGraphDependency = TaskGraph & {
   dependencyObj: DependencyTask
 }

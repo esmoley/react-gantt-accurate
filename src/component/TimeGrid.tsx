@@ -110,7 +110,13 @@ export const TimeGrid = ({
           spaceX={CELL_WIDTH}
           height={timeGridHeight + CELL_HEIGHT}
         />
-        <Dependencies y={CELL_HEIGHT + 10} taskGraphArr={taskGraphArr} startDate={startDate} cellMs={cellMs} />
+        <Dependencies
+          y={CELL_HEIGHT + 10}
+          taskGraphArr={taskGraphArr}
+          startDate={startDate}
+          cellMs={cellMs}
+          taskMinWidthAlign={taskMinWidthAlign}
+        />
         <TaskRowsTimePeriods
           y={CELL_HEIGHT + 10}
           taskGraphArr={taskGraphArr}

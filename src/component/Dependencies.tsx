@@ -1,24 +1,26 @@
 import React from 'react'
-import { CELL_HEIGHT, CELL_WIDTH } from '../util/consts'
-import { TaskGraph } from '../util/types'
+import { CELL_HEIGHT } from '../util/consts'
+import { TaskGraph, TaskMinWidthAlignType } from '../util/types'
+import { getTaskGraphRowPos } from '../util/taskGraphUtils'
 
 type DependenciesProps = {
   y: number
   taskGraphArr: TaskGraph[]
   startDate: Date
   cellMs: number
+  taskMinWidthAlign: TaskMinWidthAlignType
 }
-export const Dependencies = ({ y, taskGraphArr, startDate, cellMs }: DependenciesProps) => {
+export const Dependencies = ({ y, taskGraphArr, startDate, cellMs, taskMinWidthAlign }: DependenciesProps) => {
   return taskGraphArr.map((t) => {
     if (t.dependencies.length === 0) return null
     return t.dependencies.map((dependencyTask) => {
       const value = dependencyTask
-      const taskStartX = ((t.start - startDate.getTime()) / cellMs) * CELL_WIDTH
-      const taskEndX = ((t.start - startDate.getTime() + t.end - t.start) / cellMs) * CELL_WIDTH
+      const { x: taskStartX, width: taskWidth } = getTaskGraphRowPos(t, startDate, cellMs, taskMinWidthAlign)
+      const taskEndX = taskStartX + taskWidth
       const taskY = y + t.rowIndex * CELL_HEIGHT + CELL_HEIGHT / 2
 
-      const depStartX = ((value.start - startDate.getTime()) / cellMs) * CELL_WIDTH
-      const depEndX = ((value.start - startDate.getTime() + value.end - value.start) / cellMs) * CELL_WIDTH
+      const { x: depStartX, width: depWidth } = getTaskGraphRowPos(value, startDate, cellMs, taskMinWidthAlign)
+      const depEndX = depStartX + depWidth
       const depY = y + value.rowIndex * CELL_HEIGHT + CELL_HEIGHT / 2
       const isTaskHigher = t.rowIndex < value.rowIndex
       const isSameRow = t.rowIndex === value.rowIndex
