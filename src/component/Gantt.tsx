@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { getNoDataText } from '../util/ganttUtils'
-import { DependencyTask, LocaleType, Row, TaskGraph, ViewModeType } from '../util/types'
+import { DependencyTask, LocaleType, Row, TaskGraph, TaskMinWidthAlignType, ViewModeType } from '../util/types'
 import './styles.css'
 import { CELL_HEIGHT, DAY_MS, HOUR_MS, MILLISECOND_MS, MINUTE_MS, SECOND_MS } from '../util/consts'
 import { TimeGrid } from './TimeGrid'
@@ -13,6 +13,7 @@ type GanntProps = {
   viewMode?: ViewModeType
   namesPanelWidth?: number
   namesPanelTextAlign?: React.CSSProperties['textAlign']
+  taskMinWidthAlign?: TaskMinWidthAlignType
 }
 export const Gantt = ({
   rows = [],
@@ -21,6 +22,7 @@ export const Gantt = ({
   viewMode = 'days',
   namesPanelWidth = 150,
   namesPanelTextAlign = 'center',
+  taskMinWidthAlign = 'start',
 }: GanntProps) => {
   const [taskTooltipId, setTaskTooltipId] = useState('')
   const [taskTooltipTop, setTaskTooltipTop] = useState(150)
@@ -231,6 +233,7 @@ export const Gantt = ({
               setTaskTooltipContent={setTaskTooltipContent}
               setTaskTooltipTaskX={setTaskTooltipTaskX}
               setTaskTooltipTaskWidth={setTaskTooltipTaskWidth}
+              taskMinWidthAlign={taskMinWidthAlign}
             />
           </>
         ) : (

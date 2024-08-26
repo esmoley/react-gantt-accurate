@@ -1,6 +1,6 @@
 import React from 'react'
 import { CELL_HEIGHT, CELL_WIDTH, LEFT_PADDING } from '../util/consts'
-import { LocaleType, Row, TaskGraph, ViewModeType } from '../util/types'
+import { LocaleType, Row, TaskGraph, TaskMinWidthAlignType, ViewModeType } from '../util/types'
 import { DaysRow } from './DaysRow'
 import { DaysOfTheWeekRow } from './DaysOfTheWeekRow'
 import { HoursRow } from './HoursRow'
@@ -31,6 +31,7 @@ type TimeGridProps = {
   setTaskTooltipContent: React.Dispatch<React.SetStateAction<string | JSX.Element>>
   setTaskTooltipTaskX: React.Dispatch<React.SetStateAction<number>>
   setTaskTooltipTaskWidth: React.Dispatch<React.SetStateAction<number>>
+  taskMinWidthAlign: TaskMinWidthAlignType
 }
 export const TimeGrid = ({
   rows,
@@ -50,6 +51,7 @@ export const TimeGrid = ({
   setTaskTooltipContent,
   setTaskTooltipTaskX,
   setTaskTooltipTaskWidth,
+  taskMinWidthAlign,
 }: TimeGridProps) => {
   const columnsCount = (endDate.getTime() - startDate.getTime()) / cellMs
   const timeLineWidth = CELL_WIDTH * columnsCount
@@ -124,6 +126,7 @@ export const TimeGrid = ({
           setTaskTooltipContent={setTaskTooltipContent}
           setTaskTooltipTaskX={setTaskTooltipTaskX}
           setTaskTooltipTaskWidth={setTaskTooltipTaskWidth}
+          taskMinWidthAlign={taskMinWidthAlign}
         />
       </svg>
     </div>

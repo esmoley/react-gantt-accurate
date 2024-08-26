@@ -35,3 +35,5 @@ export type TaskGraphDependency = TaskGraph & {
 }
 
 export type ViewModeType = 'days' | 'hours' | 'minutes' | 'seconds' | 'milliseconds'
+
+export type TaskMinWidthAlignType = 'start' | 'end'

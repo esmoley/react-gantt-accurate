@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { CELL_HEIGHT, CELL_WIDTH, TIME_PERIOD_HEIGHT } from '../util/consts'
-import { TaskGraph } from '../util/types'
+import { CELL_HEIGHT, CELL_WIDTH, MIN_TASK_WIDTH, TIME_PERIOD_HEIGHT } from '../util/consts'
+import { TaskGraph, TaskMinWidthAlignType } from '../util/types'
 
 type TaskRowsTimePeriodsProps = {
   y: number
@@ -17,6 +17,7 @@ type TaskRowsTimePeriodsProps = {
   setTaskTooltipContent: React.Dispatch<React.SetStateAction<string | JSX.Element>>
   setTaskTooltipTaskX: React.Dispatch<React.SetStateAction<number>>
   setTaskTooltipTaskWidth: React.Dispatch<React.SetStateAction<number>>
+  taskMinWidthAlign: TaskMinWidthAlignType
 }
 
 export const TaskRowsTimePeriods = ({
@@ -34,6 +35,7 @@ export const TaskRowsTimePeriods = ({
   setTaskTooltipContent,
   setTaskTooltipTaskX,
   setTaskTooltipTaskWidth,
+  taskMinWidthAlign,
 }: TaskRowsTimePeriodsProps) => {
   const [mouseOverTask, setMouseOverTask] = useState<TaskGraph>(null)
   useEffect(() => {
@@ -44,8 +46,13 @@ export const TaskRowsTimePeriods = ({
   return (
     <g>
       {taskGraphArr.map((t) => {
-        const x = ((t.start - startDate.getTime()) / cellMs) * CELL_WIDTH
-        const width = ((t.end - t.start) / cellMs) * CELL_WIDTH
+        let x = ((t.start - startDate.getTime()) / cellMs) * CELL_WIDTH
+        let width = ((t.end - t.start) / cellMs) * CELL_WIDTH
+        if (width < MIN_TASK_WIDTH) {
+          if (taskMinWidthAlign === 'end') x -= MIN_TASK_WIDTH - width
+
+          width = MIN_TASK_WIDTH
+        }
         const curY = y + t.rowIndex * CELL_HEIGHT + 7
         return (
           <rect
@@ -53,7 +60,7 @@ export const TaskRowsTimePeriods = ({
             fill={t?.task.color ?? '#91bbfe'}
             x={x}
             y={curY}
-            width={width >= 6 ? width : 6}
+            width={width}
             height={TIME_PERIOD_HEIGHT}
             ry={3}
             rx={3}
