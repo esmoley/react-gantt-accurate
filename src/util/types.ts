@@ -18,6 +18,7 @@ export type Task = {
 }
 export type Row = {
   name: string
+  backgroundColor?: string
   tasks: Task[]
 }
 

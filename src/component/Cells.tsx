@@ -18,19 +18,22 @@ export const Cells = ({ rows, y, startDate, endDate, cellMs, viewMode }: CellsPr
   while (currentCellMs < endDate.getTime() + cellMs) {
     const currentDate = new Date(currentCellMs)
     res.push(
-      <rect
-        key={currentCellMs}
-        x={curX}
-        y={y}
-        width={CELL_WIDTH}
-        height={CELL_HEIGHT * rows.length}
-        className={
-          (viewMode === 'days' && getDayOfWeek(currentDate) === 'S') ||
-          (viewMode === 'hours' && currentDate.getHours() >= 12)
-            ? 'cell-rect-secondary'
-            : 'cell-rect-primary'
-        }
-      />,
+      rows.map((row, i) => (
+        <rect
+          key={currentCellMs + '_' + i}
+          x={curX}
+          y={y + CELL_HEIGHT * i}
+          width={CELL_WIDTH}
+          height={CELL_HEIGHT}
+          className={
+            (viewMode === 'days' && getDayOfWeek(currentDate) === 'S') ||
+            (viewMode === 'hours' && currentDate.getHours() >= 12)
+              ? 'cell-rect-secondary'
+              : 'cell-rect-primary'
+          }
+          style={{ fill: row.backgroundColor }}
+        />
+      )),
     )
     curX += CELL_WIDTH
     currentCellMs += cellMs
