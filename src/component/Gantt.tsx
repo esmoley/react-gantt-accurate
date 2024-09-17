@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { getNoDataText } from '../util/ganttUtils'
 import { DependencyTask, LocaleType, Row, TaskGraph, TaskMinWidthAlignType, ViewModeType } from '../util/types'
 import './styles.css'
@@ -42,36 +42,43 @@ export const Gantt = ({
       : viewMode === 'milliseconds'
       ? MILLISECOND_MS
       : DAY_MS
-  const taskGraphMap: Map<string, TaskGraph> = rows?.reduce((accRows, row, rowIndex) => {
-    return row.tasks.reduce((acc, task, index) => {
-      return acc.set(task.id, {
-        rowIndex,
-        index,
-        task: task,
-        start: task.start instanceof Date ? task.start.getTime() : task.start,
-        end: task.end instanceof Date ? task.end.getTime() : task.end,
-        dependencies: [],
-      })
-    }, accRows)
-  }, new Map<string, TaskGraph>())
+  const taskGraphMap: Map<string, TaskGraph> = useMemo(
+    () =>
+      rows?.reduce((accRows, row, rowIndex) => {
+        const res = row.tasks.reduce((acc, task, index) => {
+          return acc.set(task.id, {
+            rowIndex,
+            index,
+            task: task,
+            start: task.start instanceof Date ? task.start.getTime() : task.start,
+            end: task.end instanceof Date ? task.end.getTime() : task.end,
+            dependencies: [],
+          })
+        }, accRows)
+        //udpate dependencies
+        res.forEach((t) => {
+          t.dependencies = []
+          t.task.dependencies?.forEach((dependency: string | DependencyTask) => {
+            const dependencyObj: DependencyTask =
+              typeof dependency === 'string'
+                ? {
+                    id: dependency,
+                  }
+                : dependency
+            if (res.has(dependencyObj.id)) {
+              t.dependencies.push({
+                ...res.get(dependencyObj.id),
+                dependencyObj,
+              })
+            }
+          })
+        })
+        return res
+      }, new Map<string, TaskGraph>()),
+    [rows],
+  )
 
   const taskGraphArr: TaskGraph[] = Array.from(taskGraphMap.values())
-  //udpate deps
-  taskGraphMap.forEach((t) =>
-    t.task.dependencies?.forEach((dependency: string | DependencyTask) => {
-      const dependencyObj: DependencyTask =
-        typeof dependency === 'string'
-          ? {
-              id: dependency,
-            }
-          : dependency
-      taskGraphMap.has(dependencyObj.id) &&
-        t.dependencies.push({
-          ...taskGraphMap.get(dependencyObj.id),
-          dependencyObj,
-        })
-    }),
-  )
   const lowestTaskGraphStart: TaskGraph = taskGraphArr.reduce(
     (acc, task) => (task.start < acc.start ? task : acc),
     taskGraphArr.length ? taskGraphArr[0] : null,
