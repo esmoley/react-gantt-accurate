@@ -12,7 +12,7 @@ export const BackgroundColor = {
     const rows = [
       {
         name: 'First Task',
-        backgroundColor: '#e4ffaa',
+        backgroundColor: '#7C93C3',
         tasks: [
           {
             id: 'Task 1',
