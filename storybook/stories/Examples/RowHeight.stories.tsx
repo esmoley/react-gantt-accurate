@@ -8,7 +8,7 @@ export default {
 }
 
 export const Slider = {
-  render: (args) => {
+  render: (args: { rowHeight: number | undefined }) => {
     const rows = [
       {
         name: 'First Task',
