@@ -1,5 +1,4 @@
 import React from 'react'
-import { CELL_HEIGHT } from '../util/consts'
 import { TaskGraph, TaskMinWidthAlignType } from '../util/types'
 import { getTaskGraphRowPos } from '../util/taskGraphUtils'
 
@@ -9,19 +8,27 @@ type DependenciesProps = {
   startDate: Date
   cellMs: number
   taskMinWidthAlign: TaskMinWidthAlignType
+  rowHeight: number
 }
-export const Dependencies = ({ y, taskGraphArr, startDate, cellMs, taskMinWidthAlign }: DependenciesProps) => {
+export const Dependencies = ({
+  y,
+  taskGraphArr,
+  startDate,
+  cellMs,
+  taskMinWidthAlign,
+  rowHeight,
+}: DependenciesProps) => {
   return taskGraphArr.map((t) => {
     if (t.dependencies.length === 0) return null
     return t.dependencies.map((dependencyTask) => {
       const value = dependencyTask
       const { x: taskStartX, width: taskWidth } = getTaskGraphRowPos(t, startDate, cellMs, taskMinWidthAlign)
       const taskEndX = taskStartX + taskWidth
-      const taskY = y + t.rowIndex * CELL_HEIGHT + CELL_HEIGHT / 2
+      const taskY = y + t.rowIndex * rowHeight + rowHeight / 2
 
       const { x: depStartX, width: depWidth } = getTaskGraphRowPos(value, startDate, cellMs, taskMinWidthAlign)
       const depEndX = depStartX + depWidth
-      const depY = y + value.rowIndex * CELL_HEIGHT + CELL_HEIGHT / 2
+      const depY = y + value.rowIndex * rowHeight + rowHeight / 2
       const isTaskHigher = t.rowIndex < value.rowIndex
       const isSameRow = t.rowIndex === value.rowIndex
       const onClick = dependencyTask.dependencyObj?.onClick
@@ -39,10 +46,10 @@ export const Dependencies = ({ y, taskGraphArr, startDate, cellMs, taskMinWidthA
               h 10
               ${
                 taskStartX - depEndX - 20 > 0
-                  ? `h ${taskStartX - depEndX - 20} v ${isTaskHigher ? '-' : ''}${CELL_HEIGHT / 2}`
-                  : `v ${isTaskHigher ? '-' : ''}${CELL_HEIGHT / 2} h ${taskStartX - depEndX - 20}`
+                  ? `h ${taskStartX - depEndX - 20} v ${isTaskHigher ? '-' : ''}${rowHeight / 2}`
+                  : `v ${isTaskHigher ? '-' : ''}${rowHeight / 2} h ${taskStartX - depEndX - 20}`
               }
-              v ${CELL_HEIGHT * (t.rowIndex - value.rowIndex) + ((isTaskHigher ? 1 : -1) * CELL_HEIGHT) / 2}
+              v ${rowHeight * (t.rowIndex - value.rowIndex) + ((isTaskHigher ? 1 : -1) * rowHeight) / 2}
               h 10 `
             }
           />

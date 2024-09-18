@@ -7,14 +7,12 @@ export const NoDataTextEn = 'No data'
 export const NoDataTextRu = 'Нет данных'
 
 export const CELL_WIDTH = 30
-export const CELL_HEIGHT = 40
 export const LEFT_PADDING = 15
 export const MILLISECOND_MS = 1
 export const SECOND_MS = 1000
 export const MINUTE_MS = 60 * 1000
 export const HOUR_MS = 60 * 60 * 1000
 export const DAY_MS = 24 * 60 * 60 * 1000 // hours*minutes*seconds*milliseconds
-export const TIME_PERIOD_HEIGHT = CELL_HEIGHT - 14
 export const MIN_TASK_WIDTH = 6
 
 export const SCREEN_PADDING = 15

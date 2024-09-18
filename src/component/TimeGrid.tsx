@@ -1,5 +1,5 @@
 import React from 'react'
-import { CELL_HEIGHT, CELL_WIDTH, LEFT_PADDING } from '../util/consts'
+import { CELL_WIDTH, LEFT_PADDING } from '../util/consts'
 import { LocaleType, Row, TaskGraph, TaskMinWidthAlignType, ViewModeType } from '../util/types'
 import { DaysRow } from './DaysRow'
 import { DaysOfTheWeekRow } from './DaysOfTheWeekRow'
@@ -32,6 +32,8 @@ type TimeGridProps = {
   setTaskTooltipTaskX: React.Dispatch<React.SetStateAction<number>>
   setTaskTooltipTaskWidth: React.Dispatch<React.SetStateAction<number>>
   taskMinWidthAlign: TaskMinWidthAlignType
+  rowHeight: number
+  timePeriodHeight: number
 }
 export const TimeGrid = ({
   rows,
@@ -52,73 +54,72 @@ export const TimeGrid = ({
   setTaskTooltipTaskX,
   setTaskTooltipTaskWidth,
   taskMinWidthAlign,
+  rowHeight,
+  timePeriodHeight,
 }: TimeGridProps) => {
   const columnsCount = (endDate.getTime() - startDate.getTime()) / cellMs
   const timeLineWidth = CELL_WIDTH * columnsCount
-  const timeGridHeight = CELL_HEIGHT * rows.length + 10
+  const timeGridHeight = rowHeight * rows.length + 10
   return (
     <div style={{ overflowX: 'auto' }}>
-      <svg width={timeLineWidth + LEFT_PADDING / 2} height={timeGridHeight + CELL_HEIGHT}>
+      <svg width={timeLineWidth + LEFT_PADDING / 2} height={timeGridHeight + rowHeight}>
         {viewMode === 'days' && (
           <>
-            <DaysRow y={CELL_HEIGHT / 2} startDate={startDate} endDate={endDate} cellMs={cellMs} />
-            <DaysOfTheWeekRow y={CELL_HEIGHT} startDate={startDate} endDate={endDate} cellMs={cellMs} locale={locale} />
+            <DaysRow y={rowHeight / 2} startDate={startDate} endDate={endDate} cellMs={cellMs} />
+            <DaysOfTheWeekRow y={rowHeight} startDate={startDate} endDate={endDate} cellMs={cellMs} locale={locale} />
           </>
         )}
         {viewMode === 'hours' && (
           <>
-            <DaysRow y={CELL_HEIGHT / 2} startDate={startDate} endDate={endDate} cellMs={cellMs} />
-            <HoursRow y={CELL_HEIGHT} startDate={startDate} endDate={endDate} cellMs={cellMs} />
+            <DaysRow y={rowHeight / 2} startDate={startDate} endDate={endDate} cellMs={cellMs} />
+            <HoursRow y={rowHeight} startDate={startDate} endDate={endDate} cellMs={cellMs} />
           </>
         )}
         {viewMode === 'minutes' && (
           <>
-            <HoursRow y={CELL_HEIGHT / 2} startDate={startDate} endDate={endDate} cellMs={cellMs} />
-            <MinutesRow y={CELL_HEIGHT} startDate={startDate} endDate={endDate} cellMs={cellMs} />
+            <HoursRow y={rowHeight / 2} startDate={startDate} endDate={endDate} cellMs={cellMs} />
+            <MinutesRow y={rowHeight} startDate={startDate} endDate={endDate} cellMs={cellMs} />
           </>
         )}
         {viewMode === 'seconds' && (
           <>
-            <MinutesRow y={CELL_HEIGHT / 2} startDate={startDate} endDate={endDate} cellMs={cellMs} />
-            <SecondsRow y={CELL_HEIGHT} startDate={startDate} endDate={endDate} cellMs={cellMs} />
+            <MinutesRow y={rowHeight / 2} startDate={startDate} endDate={endDate} cellMs={cellMs} />
+            <SecondsRow y={rowHeight} startDate={startDate} endDate={endDate} cellMs={cellMs} />
           </>
         )}
         {viewMode === 'milliseconds' && (
           <>
-            <SecondsRow y={CELL_HEIGHT / 2} startDate={startDate} endDate={endDate} cellMs={cellMs} />
-            <MillisecondsRow y={CELL_HEIGHT} startDate={startDate} endDate={endDate} cellMs={cellMs} />
+            <SecondsRow y={rowHeight / 2} startDate={startDate} endDate={endDate} cellMs={cellMs} />
+            <MillisecondsRow y={rowHeight} startDate={startDate} endDate={endDate} cellMs={cellMs} />
           </>
         )}
         <Cells
-          y={CELL_HEIGHT + 10}
+          y={rowHeight + 10}
           startDate={startDate}
           endDate={endDate}
           cellMs={cellMs}
           viewMode={viewMode}
           rows={rows}
+          rowHeight={rowHeight}
         />
-        <RowLines
-          y={CELL_HEIGHT + 10}
-          amount={rows.length + 1}
-          spaceY={CELL_HEIGHT}
-          width={timeLineWidth + LEFT_PADDING}
-        />
+        <RowLines y={rowHeight + 10} amount={rows.length + 1} spaceY={rowHeight} width={timeLineWidth + LEFT_PADDING} />
         <ColumnLines
           x={0}
-          y={CELL_HEIGHT + 10}
+          y={rowHeight + 10}
           amount={columnsCount + 1}
           spaceX={CELL_WIDTH}
-          height={timeGridHeight + CELL_HEIGHT}
+          height={timeGridHeight + rowHeight}
         />
         <Dependencies
-          y={CELL_HEIGHT + 10}
+          y={rowHeight + 10}
           taskGraphArr={taskGraphArr}
           startDate={startDate}
           cellMs={cellMs}
           taskMinWidthAlign={taskMinWidthAlign}
+          rowHeight={rowHeight}
         />
         <TaskRowsTimePeriods
-          y={CELL_HEIGHT + 10}
+          y={rowHeight + 10}
           taskGraphArr={taskGraphArr}
           startDate={startDate}
           cellMs={cellMs}
@@ -133,6 +134,8 @@ export const TimeGrid = ({
           setTaskTooltipTaskX={setTaskTooltipTaskX}
           setTaskTooltipTaskWidth={setTaskTooltipTaskWidth}
           taskMinWidthAlign={taskMinWidthAlign}
+          rowHeight={rowHeight}
+          timePeriodHeight={timePeriodHeight}
         />
       </svg>
     </div>

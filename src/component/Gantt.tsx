@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react'
 import { getNoDataText } from '../util/ganttUtils'
 import { DependencyTask, LocaleType, Row, TaskGraph, TaskMinWidthAlignType, ViewModeType } from '../util/types'
 import './styles.css'
-import { CELL_HEIGHT, DAY_MS, HOUR_MS, MILLISECOND_MS, MINUTE_MS, SECOND_MS } from '../util/consts'
+import { DAY_MS, HOUR_MS, MILLISECOND_MS, MINUTE_MS, SECOND_MS } from '../util/consts'
 import { TimeGrid } from './TimeGrid'
 import { TaskTooltip } from './TaskTooltip'
 
@@ -14,6 +14,7 @@ type GanntProps = {
   namesPanelWidth?: number
   namesPanelTextAlign?: React.CSSProperties['textAlign']
   taskMinWidthAlign?: TaskMinWidthAlignType
+  rowHeight?: number
 }
 export const Gantt = ({
   rows = [],
@@ -23,6 +24,7 @@ export const Gantt = ({
   namesPanelWidth = 150,
   namesPanelTextAlign = 'center',
   taskMinWidthAlign = 'start',
+  rowHeight = 40,
 }: GanntProps) => {
   const [taskTooltipId, setTaskTooltipId] = useState('')
   const [taskTooltipTop, setTaskTooltipTop] = useState(150)
@@ -31,6 +33,7 @@ export const Gantt = ({
   const [taskTooltipTaskX, setTaskTooltipTaskX] = useState<number>(0)
   const [taskTooltipTaskWidth, setTaskTooltipTaskWidth] = useState<number>(0)
   const [taskTooltipMouseOver, setTaskTooltipMouseOver] = useState<boolean>(false)
+  const timePeriodHeight = rowHeight - 14
 
   const cellMs =
     viewMode === 'hours'
@@ -202,9 +205,9 @@ export const Gantt = ({
         {rows.length ? (
           <>
             <div className='gantt-grid-container__tasks'>
-              <div className='gantt-task-row-top' style={{ marginTop: `${CELL_HEIGHT + 9}px` }}></div>
+              <div className='gantt-task-row-top' style={{ marginTop: `${rowHeight + 9}px` }}></div>
               {rows.map((row, index) => (
-                <div key={index} className='gantt-task-row' style={{ height: `${CELL_HEIGHT}px` }}>
+                <div key={index} className='gantt-task-row' style={{ height: `${rowHeight}px` }}>
                   <div
                     style={{
                       maxWidth: `${namesPanelWidth}px`,
@@ -241,6 +244,8 @@ export const Gantt = ({
               setTaskTooltipTaskX={setTaskTooltipTaskX}
               setTaskTooltipTaskWidth={setTaskTooltipTaskWidth}
               taskMinWidthAlign={taskMinWidthAlign}
+              rowHeight={rowHeight}
+              timePeriodHeight={timePeriodHeight}
             />
           </>
         ) : (
@@ -261,6 +266,7 @@ export const Gantt = ({
         setTaskTooltipContent={setTaskTooltipContent}
         setTaskTooltipTaskX={setTaskTooltipTaskX}
         setTaskTooltipTaskWidth={setTaskTooltipTaskWidth}
+        rowHeight={rowHeight}
       />
     </div>
   )

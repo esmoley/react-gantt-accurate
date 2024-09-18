@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { CELL_HEIGHT, SCREEN_PADDING } from '../util/consts'
+import { SCREEN_PADDING } from '../util/consts'
 import React from 'react'
 
 export type TaskTooltipProps = {
@@ -16,6 +16,7 @@ export type TaskTooltipProps = {
   setTaskTooltipContent: React.Dispatch<React.SetStateAction<string | JSX.Element>>
   setTaskTooltipTaskX: React.Dispatch<React.SetStateAction<number>>
   setTaskTooltipTaskWidth: React.Dispatch<React.SetStateAction<number>>
+  rowHeight: number
 }
 export const TaskTooltip = ({
   top,
@@ -31,6 +32,7 @@ export const TaskTooltip = ({
   setTaskTooltipContent,
   setTaskTooltipTaskX,
   setTaskTooltipTaskWidth,
+  rowHeight,
 }: TaskTooltipProps) => {
   const tooltipChildRef = useRef<HTMLDivElement>(null)
 
@@ -77,8 +79,8 @@ export const TaskTooltip = ({
     setInnerLeft('50%')
     setInnerRight(null)
     setStep('UpdateOrientation')
-    setTopUpdated(top + CELL_HEIGHT / 2)
-  }, [show, tooltipRightToTaskX, top, step])
+    setTopUpdated(top + rowHeight / 2)
+  }, [show, tooltipRightToTaskX, top, step, rowHeight])
 
   useEffect(() => {
     if (!show || !tooltipChildRef.current || step !== 'UpdateOrientation') return
@@ -99,10 +101,10 @@ export const TaskTooltip = ({
       setRight(SCREEN_PADDING)
       setInnerLeft(null)
       setInnerRight('50%')
-      setTopUpdated(top + CELL_HEIGHT / 2)
+      setTopUpdated(top + rowHeight / 2)
     }
     setStep('SetTop')
-  }, [step, show, tooltipRightToTaskX, top, windowWidthScrolled])
+  }, [step, show, tooltipRightToTaskX, top, windowWidthScrolled, rowHeight])
 
   useEffect(() => {
     if (!show || !tooltipChildRef.current || step !== 'SetTop') return
