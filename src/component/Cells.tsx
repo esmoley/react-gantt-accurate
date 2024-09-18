@@ -31,7 +31,7 @@ export const Cells = ({ rows, y, startDate, endDate, cellMs, viewMode }: CellsPr
               ? 'cell-rect-secondary'
               : 'cell-rect-primary'
           }
-          style={{ fill: row.backgroundColor }}
+          style={row.style}
         />
       )),
     )

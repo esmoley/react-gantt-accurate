@@ -18,7 +18,7 @@ export type Task = {
 }
 export type Row = {
   name: string
-  backgroundColor?: string
+  style?: React.CSSProperties
   tasks: Task[]
 }
 

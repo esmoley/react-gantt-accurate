@@ -7,12 +7,12 @@ export default {
   tags: ['autodocs'],
 }
 
-export const BackgroundColor = {
+export const Styling = {
   render: () => {
     const rows = [
       {
         name: 'First Task',
-        backgroundColor: '#7C93C3',
+        style: { fill: '#7C93C3' },
         tasks: [
           {
             id: 'Task 1',
