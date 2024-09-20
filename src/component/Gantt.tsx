@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { getNoDataText } from '../util/ganttUtils'
+import { getNoDataText, getViewModeSelectOptions } from '../util/ganttUtils'
 import { DependencyTask, LocaleType, Row, TaskGraph, TaskMinWidthAlignType, ViewModeType } from '../util/types'
 import './styles.css'
 import { DAY_MS, HOUR_MS, MILLISECOND_MS, MINUTE_MS, SECOND_MS } from '../util/consts'
@@ -10,21 +10,23 @@ type GanntProps = {
   rows?: Row[]
   locale?: LocaleType
   theme?: 'light' | 'dark'
-  viewMode?: ViewModeType
+  viewMode?: ViewModeType | 'auto'
   namesPanelWidth?: number
   namesPanelTextAlign?: React.CSSProperties['textAlign']
   taskMinWidthAlign?: TaskMinWidthAlignType
   rowHeight?: number
+  hideViewModePicker?: boolean
 }
 export const Gantt = ({
   rows = [],
   locale = 'en',
   theme = 'light',
-  viewMode = 'days',
+  viewMode = 'auto',
   namesPanelWidth = 150,
   namesPanelTextAlign = 'center',
   taskMinWidthAlign = 'start',
   rowHeight = 40,
+  hideViewModePicker = false,
 }: GanntProps) => {
   const [taskTooltipId, setTaskTooltipId] = useState('')
   const [taskTooltipTop, setTaskTooltipTop] = useState(150)
@@ -33,16 +35,19 @@ export const Gantt = ({
   const [taskTooltipTaskX, setTaskTooltipTaskX] = useState<number>(0)
   const [taskTooltipTaskWidth, setTaskTooltipTaskWidth] = useState<number>(0)
   const [taskTooltipMouseOver, setTaskTooltipMouseOver] = useState<boolean>(false)
+  const [viewModeActual, setViewModeActual] = useState<ViewModeType>(
+    viewMode && viewMode !== 'auto' ? viewMode : 'days',
+  )
   const timePeriodHeight = rowHeight - 14
 
   const cellMs =
-    viewMode === 'hours'
+    viewModeActual === 'hours'
       ? HOUR_MS
-      : viewMode === 'minutes'
+      : viewModeActual === 'minutes'
       ? MINUTE_MS
-      : viewMode === 'seconds'
+      : viewModeActual === 'seconds'
       ? SECOND_MS
-      : viewMode === 'milliseconds'
+      : viewModeActual === 'milliseconds'
       ? MILLISECOND_MS
       : DAY_MS
   const taskGraphMap: Map<string, TaskGraph> = useMemo(
@@ -94,7 +99,7 @@ export const Gantt = ({
 
   //#region startDate
   const startDate =
-    viewMode === 'hours'
+    viewModeActual === 'hours'
       ? new Date(
           lowestTaskStartDate.getFullYear(),
           lowestTaskStartDate.getMonth(),
@@ -104,7 +109,7 @@ export const Gantt = ({
           0,
           0,
         )
-      : viewMode === 'minutes'
+      : viewModeActual === 'minutes'
       ? new Date(
           lowestTaskStartDate.getFullYear(),
           lowestTaskStartDate.getMonth(),
@@ -114,7 +119,7 @@ export const Gantt = ({
           0,
           0,
         )
-      : viewMode === 'seconds'
+      : viewModeActual === 'seconds'
       ? new Date(
           lowestTaskStartDate.getFullYear(),
           lowestTaskStartDate.getMonth(),
@@ -124,7 +129,7 @@ export const Gantt = ({
           lowestTaskStartDate.getSeconds() - 1,
           0,
         )
-      : viewMode === 'milliseconds'
+      : viewModeActual === 'milliseconds'
       ? new Date(
           lowestTaskStartDate.getFullYear(),
           lowestTaskStartDate.getMonth(),
@@ -148,7 +153,7 @@ export const Gantt = ({
 
   //#region endDate
   const endDate =
-    viewMode === 'hours'
+    viewModeActual === 'hours'
       ? new Date(
           new Date(
             highestTaskEndDate.getFullYear(),
@@ -160,7 +165,7 @@ export const Gantt = ({
             0,
           ).getTime() - 0.001,
         )
-      : viewMode === 'minutes'
+      : viewModeActual === 'minutes'
       ? new Date(
           new Date(
             highestTaskEndDate.getFullYear(),
@@ -172,7 +177,7 @@ export const Gantt = ({
             0,
           ).getTime() - 0.001,
         )
-      : viewMode === 'seconds'
+      : viewModeActual === 'seconds'
       ? new Date(
           new Date(
             highestTaskEndDate.getFullYear(),
@@ -184,7 +189,7 @@ export const Gantt = ({
             0,
           ).getTime() - 0.001,
         )
-      : viewMode === 'milliseconds'
+      : viewModeActual === 'milliseconds'
       ? new Date(
           new Date(
             highestTaskEndDate.getFullYear(),
@@ -205,7 +210,20 @@ export const Gantt = ({
         {rows.length ? (
           <>
             <div className='gantt-grid-container__tasks'>
-              <div className='gantt-task-row-top' style={{ marginTop: `${rowHeight + 9}px` }}></div>
+              <div className='gantt-task-row-top' style={{ height: `${rowHeight + 9}px` }}>
+                {!hideViewModePicker && (
+                  <select
+                    value={viewModeActual}
+                    onChange={(val) => setViewModeActual(val.currentTarget.value as ViewModeType)}
+                  >
+                    {Object.entries(getViewModeSelectOptions(locale)).map(([key, value]) => (
+                      <option key={key} value={key}>
+                        {value}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
               {rows.map((row, index) => (
                 <div key={index} className='gantt-task-row' style={{ height: `${rowHeight}px` }}>
                   <div
@@ -230,7 +248,7 @@ export const Gantt = ({
               startDate={startDate}
               endDate={endDate}
               cellMs={cellMs}
-              viewMode={viewMode}
+              viewMode={viewModeActual}
               locale={locale}
               taskGraphArr={taskGraphArr}
               namesPanelWidth={namesPanelWidth}
