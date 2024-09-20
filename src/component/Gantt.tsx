@@ -58,8 +58,18 @@ export const Gantt = ({
             rowIndex,
             index,
             task: task,
-            start: task.start instanceof Date ? task.start.getTime() : task.start,
-            end: task.end instanceof Date ? task.end.getTime() : task.end,
+            start:
+              typeof task.start === 'number'
+                ? task.start
+                : task.start instanceof Date
+                ? task.start.getTime()
+                : new Date(task.start).getTime(),
+            end:
+              typeof task.end === 'number'
+                ? task.end
+                : task.end instanceof Date
+                ? task.end.getTime()
+                : new Date(task.end).getTime(),
             dependencies: [],
           })
         }, accRows)

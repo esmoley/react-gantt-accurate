@@ -1,6 +1,6 @@
 export type LocaleType = 'en' | 'ru'
 
-export type TaskDateType = Date | number
+export type TaskDateType = Date | number | string
 
 export type DependencyTask = {
   id: string
