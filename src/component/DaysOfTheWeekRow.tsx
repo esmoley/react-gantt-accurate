@@ -9,8 +9,9 @@ type DaysOfTheWeekRowProps = {
   endDate: Date
   cellMs: number
   locale: LocaleType
+  timeLineWidth: number
 }
-export const DaysOfTheWeekRow = ({ y, startDate, endDate, cellMs, locale }: DaysOfTheWeekRowProps) => {
+export const DaysOfTheWeekRow = ({ y, startDate, endDate, cellMs, locale, timeLineWidth }: DaysOfTheWeekRowProps) => {
   const res = []
   const day = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 0, 0, 0, 0)
   let curX = LEFT_PADDING
@@ -20,7 +21,8 @@ export const DaysOfTheWeekRow = ({ y, startDate, endDate, cellMs, locale }: Days
     curX += ((DAY_MS - dayDiff) / cellMs) * CELL_WIDTH
     day.setDate(day.getDate() + 1)
   }
-  while (day.getTime() < endDate.getTime()) {
+
+  while (day.getTime() < endDate.getTime() && curX < timeLineWidth) {
     const dayOfTheWeek = getDayOfWeek(day, locale)
     res.push(
       <text key={day.valueOf()} y={y} x={curX} className='days-row'>

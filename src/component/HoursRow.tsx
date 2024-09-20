@@ -6,9 +6,10 @@ type HoursRowProps = {
   startDate: Date
   endDate: Date
   cellMs: number
+  timeLineWidth: number
 }
 
-export const HoursRow = ({ y, startDate, endDate, cellMs }: HoursRowProps) => {
+export const HoursRow = ({ y, startDate, endDate, cellMs, timeLineWidth }: HoursRowProps) => {
   const res = []
   const hour = new Date(
     startDate.getFullYear(),
@@ -27,7 +28,7 @@ export const HoursRow = ({ y, startDate, endDate, cellMs }: HoursRowProps) => {
     hour.setHours(hour.getHours() + 1)
   }
 
-  while (hour.getTime() < endDate.getTime()) {
+  while (hour.getTime() < endDate.getTime() && curX < timeLineWidth) {
     res.push(
       <text key={hour.valueOf()} y={y} x={curX} className='days-row'>
         {hour.getHours()}

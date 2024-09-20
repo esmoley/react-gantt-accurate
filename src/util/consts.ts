@@ -7,6 +7,7 @@ export const NoDataTextEn = 'No data'
 export const NoDataTextRu = 'Нет данных'
 
 export const CELL_WIDTH = 30
+export const COLUMNS_MAX = 1000
 export const LEFT_PADDING = 15
 export const MILLISECOND_MS = 1
 export const SECOND_MS = 1000

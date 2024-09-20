@@ -6,9 +6,10 @@ type SecondsRowProps = {
   startDate: Date
   endDate: Date
   cellMs: number
+  timeLineWidth: number
 }
 
-export const SecondsRow = ({ y, startDate, endDate, cellMs }: SecondsRowProps) => {
+export const SecondsRow = ({ y, startDate, endDate, cellMs, timeLineWidth }: SecondsRowProps) => {
   const res = []
   const second = new Date(
     startDate.getFullYear(),
@@ -26,7 +27,7 @@ export const SecondsRow = ({ y, startDate, endDate, cellMs }: SecondsRowProps) =
     curX += ((SECOND_MS - secondDiff) / cellMs) * CELL_WIDTH
     second.setSeconds(second.getSeconds() + 1)
   }
-  while (second.getTime() < endDate.getTime()) {
+  while (second.getTime() < endDate.getTime() && curX < timeLineWidth) {
     res.push(
       <text key={second.valueOf()} y={y} x={curX} className='days-row'>
         {second.getSeconds()}

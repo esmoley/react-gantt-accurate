@@ -6,8 +6,9 @@ type MinutesRowProps = {
   startDate: Date
   endDate: Date
   cellMs: number
+  timeLineWidth: number
 }
-export const MinutesRow = ({ y, startDate, endDate, cellMs }: MinutesRowProps) => {
+export const MinutesRow = ({ y, startDate, endDate, cellMs, timeLineWidth }: MinutesRowProps) => {
   const res = []
   const minute = new Date(
     startDate.getFullYear(),
@@ -25,7 +26,7 @@ export const MinutesRow = ({ y, startDate, endDate, cellMs }: MinutesRowProps) =
     curX += ((MINUTE_MS - minutesDiff) / cellMs) * CELL_WIDTH
     minute.setMinutes(minute.getMinutes() + 1)
   }
-  while (minute.getTime() < endDate.getTime()) {
+  while (minute.getTime() < endDate.getTime() && curX < timeLineWidth) {
     res.push(
       <text key={minute.valueOf()} y={y} x={curX} className='days-row'>
         {minute.getMinutes()}

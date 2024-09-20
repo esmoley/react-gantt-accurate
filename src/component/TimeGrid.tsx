@@ -1,5 +1,5 @@
 import React from 'react'
-import { CELL_WIDTH, LEFT_PADDING } from '../util/consts'
+import { CELL_WIDTH, COLUMNS_MAX, LEFT_PADDING } from '../util/consts'
 import { LocaleType, Row, TaskGraph, TaskMinWidthAlignType, ViewModeType } from '../util/types'
 import { DaysRow } from './DaysRow'
 import { DaysOfTheWeekRow } from './DaysOfTheWeekRow'
@@ -57,7 +57,7 @@ export const TimeGrid = ({
   rowHeight,
   timePeriodHeight,
 }: TimeGridProps) => {
-  const columnsCount = (endDate.getTime() - startDate.getTime()) / cellMs
+  const columnsCount = Math.min(COLUMNS_MAX, (endDate.getTime() - startDate.getTime()) / cellMs)
   const timeLineWidth = CELL_WIDTH * columnsCount
   const timeGridHeight = rowHeight * rows.length + 10
   return (
@@ -65,32 +65,93 @@ export const TimeGrid = ({
       <svg width={timeLineWidth + LEFT_PADDING / 2} height={timeGridHeight + rowHeight}>
         {viewMode === 'days' && (
           <>
-            <DaysRow y={rowHeight / 2} startDate={startDate} endDate={endDate} cellMs={cellMs} />
-            <DaysOfTheWeekRow y={rowHeight} startDate={startDate} endDate={endDate} cellMs={cellMs} locale={locale} />
+            <DaysRow
+              y={rowHeight / 2}
+              startDate={startDate}
+              endDate={endDate}
+              cellMs={cellMs}
+              timeLineWidth={timeLineWidth}
+            />
+            <DaysOfTheWeekRow
+              y={rowHeight}
+              startDate={startDate}
+              endDate={endDate}
+              cellMs={cellMs}
+              locale={locale}
+              timeLineWidth={timeLineWidth}
+            />
           </>
         )}
         {viewMode === 'hours' && (
           <>
-            <DaysRow y={rowHeight / 2} startDate={startDate} endDate={endDate} cellMs={cellMs} />
-            <HoursRow y={rowHeight} startDate={startDate} endDate={endDate} cellMs={cellMs} />
+            <DaysRow
+              y={rowHeight / 2}
+              startDate={startDate}
+              endDate={endDate}
+              cellMs={cellMs}
+              timeLineWidth={timeLineWidth}
+            />
+            <HoursRow
+              y={rowHeight}
+              startDate={startDate}
+              endDate={endDate}
+              cellMs={cellMs}
+              timeLineWidth={timeLineWidth}
+            />
           </>
         )}
         {viewMode === 'minutes' && (
           <>
-            <HoursRow y={rowHeight / 2} startDate={startDate} endDate={endDate} cellMs={cellMs} />
-            <MinutesRow y={rowHeight} startDate={startDate} endDate={endDate} cellMs={cellMs} />
+            <HoursRow
+              y={rowHeight / 2}
+              startDate={startDate}
+              endDate={endDate}
+              cellMs={cellMs}
+              timeLineWidth={timeLineWidth}
+            />
+            <MinutesRow
+              y={rowHeight}
+              startDate={startDate}
+              endDate={endDate}
+              cellMs={cellMs}
+              timeLineWidth={timeLineWidth}
+            />
           </>
         )}
         {viewMode === 'seconds' && (
           <>
-            <MinutesRow y={rowHeight / 2} startDate={startDate} endDate={endDate} cellMs={cellMs} />
-            <SecondsRow y={rowHeight} startDate={startDate} endDate={endDate} cellMs={cellMs} />
+            <MinutesRow
+              y={rowHeight / 2}
+              startDate={startDate}
+              endDate={endDate}
+              cellMs={cellMs}
+              timeLineWidth={timeLineWidth}
+            />
+            <SecondsRow
+              y={rowHeight}
+              startDate={startDate}
+              endDate={endDate}
+              cellMs={cellMs}
+              timeLineWidth={timeLineWidth}
+            />
           </>
         )}
         {viewMode === 'milliseconds' && (
           <>
-            <SecondsRow y={rowHeight / 2} startDate={startDate} endDate={endDate} cellMs={cellMs} />
-            <MillisecondsRow y={rowHeight} startDate={startDate} endDate={endDate} cellMs={cellMs} />
+            <SecondsRow
+              y={rowHeight / 2}
+              startDate={startDate}
+              endDate={endDate}
+              cellMs={cellMs}
+              timeLineWidth={timeLineWidth}
+            />
+            <MillisecondsRow
+              y={rowHeight}
+              startDate={startDate}
+              endDate={endDate}
+              cellMs={cellMs}
+              timeLineWidth={timeLineWidth}
+            />
           </>
         )}
         <Cells
