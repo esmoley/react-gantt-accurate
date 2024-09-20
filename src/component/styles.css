@@ -86,6 +86,7 @@
   }
   select{
     position: relative;
+    appearance: button;
     -webkit-appearance: button;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
