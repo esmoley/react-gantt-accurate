@@ -1,4 +1,5 @@
 import React from 'react'
+import type { ComponentProps } from 'react'
 import { Gantt } from '../../../src'
 
 export default {
@@ -7,7 +8,17 @@ export default {
   tags: ['autodocs'],
 }
 export const Light = {
-  render: ({ data }) => <Gantt {...data} />,
+  render: ({ data }: { data: ComponentProps<typeof Gantt> }) => {
+    data.rows?.forEach((r) =>
+      r.tasks.forEach((t) => {
+        if (typeof t.start === 'string') {
+          t.start = new Date(t.start)
+          t.end = new Date(t.end)
+        }
+      }),
+    )
+    return <Gantt {...data} />
+  },
   args: {
     data: {
       rows: [
