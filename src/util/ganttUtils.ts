@@ -1,4 +1,14 @@
-import { DaysOfWeekArrEn, DaysOfWeekArrRu, NoDataTextEn, NoDataTextRu } from './consts'
+import {
+  DAY_MS,
+  DaysOfWeekArrEn,
+  DaysOfWeekArrRu,
+  HOUR_MS,
+  MILLISECOND_MS,
+  MINUTE_MS,
+  NoDataTextEn,
+  NoDataTextRu,
+  SECOND_MS,
+} from './consts'
 import { LocaleType, ViewModeType } from './types'
 
 export function getDayOfWeek(day: Date, locale: LocaleType = 'en') {
@@ -35,4 +45,117 @@ export function getViewModeSelectOptions(locale: LocaleType): {
         milliseconds: 'Milliseconds',
       }
   }
+}
+export function getStartDate(lowestTaskStartDate: Date, viewMode: ViewModeType) {
+  return viewMode === 'hours'
+    ? new Date(
+        lowestTaskStartDate.getFullYear(),
+        lowestTaskStartDate.getMonth(),
+        lowestTaskStartDate.getDate(),
+        lowestTaskStartDate.getHours() - 1,
+        0,
+        0,
+        0,
+      )
+    : viewMode === 'minutes'
+    ? new Date(
+        lowestTaskStartDate.getFullYear(),
+        lowestTaskStartDate.getMonth(),
+        lowestTaskStartDate.getDate(),
+        lowestTaskStartDate.getHours(),
+        lowestTaskStartDate.getMinutes() - 1,
+        0,
+        0,
+      )
+    : viewMode === 'seconds'
+    ? new Date(
+        lowestTaskStartDate.getFullYear(),
+        lowestTaskStartDate.getMonth(),
+        lowestTaskStartDate.getDate(),
+        lowestTaskStartDate.getHours(),
+        lowestTaskStartDate.getMinutes(),
+        lowestTaskStartDate.getSeconds() - 1,
+        0,
+      )
+    : viewMode === 'milliseconds'
+    ? new Date(
+        lowestTaskStartDate.getFullYear(),
+        lowestTaskStartDate.getMonth(),
+        lowestTaskStartDate.getDate(),
+        lowestTaskStartDate.getHours(),
+        lowestTaskStartDate.getMinutes(),
+        lowestTaskStartDate.getSeconds(),
+        lowestTaskStartDate.getMilliseconds() - 1,
+      )
+    : new Date(
+        lowestTaskStartDate.getFullYear(),
+        lowestTaskStartDate.getMonth(),
+        lowestTaskStartDate.getDate() === 1 ? 0 : 1,
+        0,
+        0,
+        0,
+        0,
+      )
+}
+export function getEndDate(highestTaskEndDate: Date, viewMode: ViewModeType) {
+  return viewMode === 'hours'
+    ? new Date(
+        new Date(
+          highestTaskEndDate.getFullYear(),
+          highestTaskEndDate.getMonth(),
+          highestTaskEndDate.getDate(),
+          highestTaskEndDate.getHours() + 2,
+          0,
+          0,
+          0,
+        ).getTime() - 0.001,
+      )
+    : viewMode === 'minutes'
+    ? new Date(
+        new Date(
+          highestTaskEndDate.getFullYear(),
+          highestTaskEndDate.getMonth(),
+          highestTaskEndDate.getDate(),
+          highestTaskEndDate.getHours(),
+          highestTaskEndDate.getMinutes() + 2,
+          0,
+          0,
+        ).getTime() - 0.001,
+      )
+    : viewMode === 'seconds'
+    ? new Date(
+        new Date(
+          highestTaskEndDate.getFullYear(),
+          highestTaskEndDate.getMonth(),
+          highestTaskEndDate.getDate(),
+          highestTaskEndDate.getHours(),
+          highestTaskEndDate.getMinutes(),
+          highestTaskEndDate.getSeconds() + 2,
+          0,
+        ).getTime() - 0.001,
+      )
+    : viewMode === 'milliseconds'
+    ? new Date(
+        new Date(
+          highestTaskEndDate.getFullYear(),
+          highestTaskEndDate.getMonth(),
+          highestTaskEndDate.getDate(),
+          highestTaskEndDate.getHours(),
+          highestTaskEndDate.getMinutes(),
+          highestTaskEndDate.getSeconds(),
+          highestTaskEndDate.getMilliseconds() + 2,
+        ).getTime() - 0.001,
+      )
+    : new Date(highestTaskEndDate.getFullYear(), highestTaskEndDate.getMonth() + 1, 1, 0, 0, 0, 0)
+}
+export function getCellMs(viewMode: ViewModeType) {
+  return viewMode === 'hours'
+    ? HOUR_MS
+    : viewMode === 'minutes'
+    ? MINUTE_MS
+    : viewMode === 'seconds'
+    ? SECOND_MS
+    : viewMode === 'milliseconds'
+    ? MILLISECOND_MS
+    : DAY_MS
 }

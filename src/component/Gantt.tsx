@@ -1,8 +1,7 @@
 import React, { useMemo, useState } from 'react'
-import { getNoDataText, getViewModeSelectOptions } from '../util/ganttUtils'
+import { getCellMs, getEndDate, getNoDataText, getStartDate, getViewModeSelectOptions } from '../util/ganttUtils'
 import { DependencyTask, LocaleType, Row, TaskGraph, TaskMinWidthAlignType, ViewModeType } from '../util/types'
 import './styles.css'
-import { DAY_MS, HOUR_MS, MILLISECOND_MS, MINUTE_MS, SECOND_MS } from '../util/consts'
 import { TimeGrid } from './TimeGrid'
 import { TaskTooltip } from './TaskTooltip'
 
@@ -40,16 +39,8 @@ export const Gantt = ({
   )
   const timePeriodHeight = rowHeight - 14
 
-  const cellMs =
-    viewModeActual === 'hours'
-      ? HOUR_MS
-      : viewModeActual === 'minutes'
-      ? MINUTE_MS
-      : viewModeActual === 'seconds'
-      ? SECOND_MS
-      : viewModeActual === 'milliseconds'
-      ? MILLISECOND_MS
-      : DAY_MS
+  const cellMs = getCellMs(viewModeActual)
+
   const taskGraphMap: Map<string, TaskGraph> = useMemo(
     () =>
       rows?.reduce((accRows, row, rowIndex) => {
@@ -107,112 +98,10 @@ export const Gantt = ({
   )
   const lowestTaskStartDate = new Date(lowestTaskGraphStart?.start ?? 0)
 
-  //#region startDate
-  const startDate =
-    viewModeActual === 'hours'
-      ? new Date(
-          lowestTaskStartDate.getFullYear(),
-          lowestTaskStartDate.getMonth(),
-          lowestTaskStartDate.getDate(),
-          lowestTaskStartDate.getHours() - 1,
-          0,
-          0,
-          0,
-        )
-      : viewModeActual === 'minutes'
-      ? new Date(
-          lowestTaskStartDate.getFullYear(),
-          lowestTaskStartDate.getMonth(),
-          lowestTaskStartDate.getDate(),
-          lowestTaskStartDate.getHours(),
-          lowestTaskStartDate.getMinutes() - 1,
-          0,
-          0,
-        )
-      : viewModeActual === 'seconds'
-      ? new Date(
-          lowestTaskStartDate.getFullYear(),
-          lowestTaskStartDate.getMonth(),
-          lowestTaskStartDate.getDate(),
-          lowestTaskStartDate.getHours(),
-          lowestTaskStartDate.getMinutes(),
-          lowestTaskStartDate.getSeconds() - 1,
-          0,
-        )
-      : viewModeActual === 'milliseconds'
-      ? new Date(
-          lowestTaskStartDate.getFullYear(),
-          lowestTaskStartDate.getMonth(),
-          lowestTaskStartDate.getDate(),
-          lowestTaskStartDate.getHours(),
-          lowestTaskStartDate.getMinutes(),
-          lowestTaskStartDate.getSeconds(),
-          lowestTaskStartDate.getMilliseconds() - 1,
-        )
-      : new Date(
-          lowestTaskStartDate.getFullYear(),
-          lowestTaskStartDate.getMonth(),
-          lowestTaskStartDate.getDate() === 1 ? 0 : 1,
-          0,
-          0,
-          0,
-          0,
-        )
-  //#endregion startDate
+  const startDate = getStartDate(lowestTaskStartDate, viewModeActual)
   const highestTaskEndDate = new Date(highestTaskGraphEnd?.end ?? 0)
 
-  //#region endDate
-  const endDate =
-    viewModeActual === 'hours'
-      ? new Date(
-          new Date(
-            highestTaskEndDate.getFullYear(),
-            highestTaskEndDate.getMonth(),
-            highestTaskEndDate.getDate(),
-            highestTaskEndDate.getHours() + 2,
-            0,
-            0,
-            0,
-          ).getTime() - 0.001,
-        )
-      : viewModeActual === 'minutes'
-      ? new Date(
-          new Date(
-            highestTaskEndDate.getFullYear(),
-            highestTaskEndDate.getMonth(),
-            highestTaskEndDate.getDate(),
-            highestTaskEndDate.getHours(),
-            highestTaskEndDate.getMinutes() + 2,
-            0,
-            0,
-          ).getTime() - 0.001,
-        )
-      : viewModeActual === 'seconds'
-      ? new Date(
-          new Date(
-            highestTaskEndDate.getFullYear(),
-            highestTaskEndDate.getMonth(),
-            highestTaskEndDate.getDate(),
-            highestTaskEndDate.getHours(),
-            highestTaskEndDate.getMinutes(),
-            highestTaskEndDate.getSeconds() + 2,
-            0,
-          ).getTime() - 0.001,
-        )
-      : viewModeActual === 'milliseconds'
-      ? new Date(
-          new Date(
-            highestTaskEndDate.getFullYear(),
-            highestTaskEndDate.getMonth(),
-            highestTaskEndDate.getDate(),
-            highestTaskEndDate.getHours(),
-            highestTaskEndDate.getMinutes(),
-            highestTaskEndDate.getSeconds(),
-            highestTaskEndDate.getMilliseconds() + 2,
-          ).getTime() - 0.001,
-        )
-      : new Date(highestTaskEndDate.getFullYear(), highestTaskEndDate.getMonth() + 1, 1, 0, 0, 0, 0)
-  //#endregion endDate
+  const endDate = getEndDate(highestTaskEndDate, viewModeActual)
 
   return (
     <div className={`react-gantt-accurate ${theme}`} style={{ position: 'relative' }}>
