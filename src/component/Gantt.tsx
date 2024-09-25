@@ -1,5 +1,12 @@
 import React, { useMemo, useState } from 'react'
-import { getCellMs, getEndDate, getNoDataText, getStartDate, getViewModeSelectOptions } from '../util/ganttUtils'
+import {
+  calcViewMode,
+  getCellMs,
+  getEndDate,
+  getNoDataText,
+  getStartDate,
+  getViewModeSelectOptions,
+} from '../util/ganttUtils'
 import { DependencyTask, LocaleType, Row, TaskGraph, TaskMinWidthAlignType, ViewModeType } from '../util/types'
 import './styles.css'
 import { TimeGrid } from './TimeGrid'
@@ -34,12 +41,7 @@ export const Gantt = ({
   const [taskTooltipTaskX, setTaskTooltipTaskX] = useState<number>(0)
   const [taskTooltipTaskWidth, setTaskTooltipTaskWidth] = useState<number>(0)
   const [taskTooltipMouseOver, setTaskTooltipMouseOver] = useState<boolean>(false)
-  const [viewModeActual, setViewModeActual] = useState<ViewModeType>(
-    viewMode && viewMode !== 'auto' ? viewMode : 'days',
-  )
   const timePeriodHeight = rowHeight - 14
-
-  const cellMs = getCellMs(viewModeActual)
 
   const taskGraphMap: Map<string, TaskGraph> = useMemo(
     () =>
@@ -96,12 +98,19 @@ export const Gantt = ({
     (acc, task) => (task.end > acc.end ? task : acc),
     taskGraphArr.length ? taskGraphArr[0] : null,
   )
-  const lowestTaskStartDate = new Date(lowestTaskGraphStart?.start ?? 0)
+  const lowestTaskStartTs = lowestTaskGraphStart?.start ?? 0
+  const highestTaskEndTs = highestTaskGraphEnd?.end ?? 0
 
+  const lowestTaskStartDate = new Date(lowestTaskStartTs)
+  const highestTaskEndDate = new Date(highestTaskEndTs)
+
+  const [viewModeActual, setViewModeActual] = useState<ViewModeType>(
+    calcViewMode(lowestTaskStartTs, highestTaskEndTs, viewMode),
+  )
   const startDate = getStartDate(lowestTaskStartDate, viewModeActual)
-  const highestTaskEndDate = new Date(highestTaskGraphEnd?.end ?? 0)
 
   const endDate = getEndDate(highestTaskEndDate, viewModeActual)
+  const cellMs = getCellMs(viewModeActual)
 
   return (
     <div className={`react-gantt-accurate ${theme}`} style={{ position: 'relative' }}>

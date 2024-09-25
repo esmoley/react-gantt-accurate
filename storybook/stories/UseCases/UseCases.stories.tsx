@@ -144,3 +144,71 @@ export const SmallestTask = {
   args: {},
   argTypes: {},
 }
+export const AdaptiveViewMode = {
+  render: ({ rows }) => {
+    return (
+      <Gantt
+        key={rows}
+        rows={[
+          {
+            name: 'Milliseconds',
+            tasks: [
+              {
+                start: 0,
+                end: 19,
+                id: '1',
+                tooltip: 'Milliseconds',
+              },
+            ],
+          },
+          {
+            name: 'Seconds',
+            tasks: [
+              {
+                start: 0,
+                end: 19000,
+                id: '2',
+                tooltip: 'Seconds',
+              },
+            ],
+          },
+          {
+            name: 'Minutes',
+            tasks: [
+              {
+                start: 0,
+                end: 19000 * 60,
+                id: '3',
+                tooltip: 'Minutes',
+              },
+            ],
+          },
+          {
+            name: 'Hours',
+            tasks: [
+              {
+                start: 0,
+                end: 19000 * 60 * 60,
+                id: '4',
+                tooltip: 'Hours',
+              },
+            ],
+          },
+          {
+            name: 'Days',
+            tasks: [
+              {
+                start: 0,
+                end: 19000 * 60 * 60 * 24,
+                id: '5',
+                tooltip: 'Days',
+              },
+            ],
+          },
+        ].slice(0, rows)}
+      />
+    )
+  },
+  args: { rows: 1 },
+  argTypes: { rows: { control: { type: 'range', min: 1, max: 5, step: 1 } } },
+}

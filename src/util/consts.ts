@@ -15,5 +15,6 @@ export const MINUTE_MS = 60 * 1000
 export const HOUR_MS = 60 * 60 * 1000
 export const DAY_MS = 24 * 60 * 60 * 1000 // hours*minutes*seconds*milliseconds
 export const MIN_TASK_WIDTH = 6
+export const ADAPTIVE_COLUMNS_MAX = 20
 
 export const SCREEN_PADDING = 15

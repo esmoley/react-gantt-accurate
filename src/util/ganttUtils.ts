@@ -1,4 +1,5 @@
 import {
+  ADAPTIVE_COLUMNS_MAX,
   DAY_MS,
   DaysOfWeekArrEn,
   DaysOfWeekArrRu,
@@ -158,4 +159,18 @@ export function getCellMs(viewMode: ViewModeType) {
     : viewMode === 'milliseconds'
     ? MILLISECOND_MS
     : DAY_MS
+}
+
+export function calcViewMode(
+  lowestTaskStartTs: number,
+  highestTaskEndTs: number,
+  viewMode: ViewModeType | 'auto',
+): ViewModeType {
+  if (viewMode && viewMode !== 'auto') return viewMode
+  const diffTs = highestTaskEndTs - lowestTaskStartTs
+  if (diffTs / MILLISECOND_MS < ADAPTIVE_COLUMNS_MAX) return 'milliseconds'
+  if (diffTs / SECOND_MS < ADAPTIVE_COLUMNS_MAX) return 'seconds'
+  if (diffTs / MINUTE_MS < ADAPTIVE_COLUMNS_MAX) return 'minutes'
+  if (diffTs / HOUR_MS < ADAPTIVE_COLUMNS_MAX) return 'hours'
+  return 'days'
 }
