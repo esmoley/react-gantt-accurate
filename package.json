@@ -11,6 +11,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "storybook": "npx storybook dev -p 6006 -c storybook",
+    "sb": "npm run storybook",
     "build-storybook": "storybook build -c storybook -o storybook-static",
     "clean:esm": "rimraf lib/esm",
     "clean:cjs": "rimraf lib/cjs",

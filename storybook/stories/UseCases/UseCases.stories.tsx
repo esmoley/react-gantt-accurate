@@ -146,68 +146,65 @@ export const SmallestTask = {
 }
 export const AdaptiveViewMode = {
   render: ({ rows }) => {
-    return (
-      <Gantt
-        key={rows}
-        rows={[
+    const rowsArr = [
+      {
+        name: 'Milliseconds',
+        tasks: [
           {
-            name: 'Milliseconds',
-            tasks: [
-              {
-                start: 0,
-                end: 19,
-                id: '1',
-                tooltip: 'Milliseconds',
-              },
-            ],
+            start: 0,
+            end: 19,
+            id: '1',
+            tooltip: 'Milliseconds',
           },
+        ],
+      },
+      {
+        name: 'Seconds',
+        tasks: [
           {
-            name: 'Seconds',
-            tasks: [
-              {
-                start: 0,
-                end: 19000,
-                id: '2',
-                tooltip: 'Seconds',
-              },
-            ],
+            start: 0,
+            end: 19000,
+            id: '2',
+            tooltip: 'Seconds',
           },
+        ],
+      },
+      {
+        name: 'Minutes',
+        tasks: [
           {
-            name: 'Minutes',
-            tasks: [
-              {
-                start: 0,
-                end: 19000 * 60,
-                id: '3',
-                tooltip: 'Minutes',
-              },
-            ],
+            start: 0,
+            end: 19000 * 60,
+            id: '3',
+            tooltip: 'Minutes',
           },
+        ],
+      },
+      {
+        name: 'Hours',
+        tasks: [
           {
-            name: 'Hours',
-            tasks: [
-              {
-                start: 0,
-                end: 19000 * 60 * 60,
-                id: '4',
-                tooltip: 'Hours',
-              },
-            ],
+            start: 0,
+            end: 19000 * 60 * 60,
+            id: '4',
+            tooltip: 'Hours',
           },
+        ],
+      },
+      {
+        name: 'Days',
+        tasks: [
           {
-            name: 'Days',
-            tasks: [
-              {
-                start: 0,
-                end: 19000 * 60 * 60 * 24,
-                id: '5',
-                tooltip: 'Days',
-              },
-            ],
+            start: 0,
+            end: 19000 * 60 * 60 * 24,
+            id: '5',
+            tooltip: 'Days',
           },
-        ].slice(0, rows)}
-      />
-    )
+        ],
+      },
+    ]
+    rowsArr.splice(rows)
+    return <Gantt key={rows} rows={rowsArr} />
   },
   args: { rows: 1 },
   argTypes: { rows: { control: { type: 'range', min: 1, max: 5, step: 1 } } },
