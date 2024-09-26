@@ -34,6 +34,7 @@ type TimeGridProps = {
   taskMinWidthAlign: TaskMinWidthAlignType
   rowHeight: number
   timePeriodHeight: number
+  timeGridRef: React.MutableRefObject<HTMLDivElement>
 }
 export const TimeGrid = ({
   rows,
@@ -56,12 +57,13 @@ export const TimeGrid = ({
   taskMinWidthAlign,
   rowHeight,
   timePeriodHeight,
+  timeGridRef,
 }: TimeGridProps) => {
   const columnsCount = Math.min(COLUMNS_MAX, (endDate.getTime() - startDate.getTime()) / cellMs)
   const timeLineWidth = CELL_WIDTH * columnsCount
   const timeGridHeight = rowHeight * rows.length + 10
   return (
-    <div style={{ overflowX: 'auto' }}>
+    <div ref={timeGridRef} style={{ overflowX: 'auto' }}>
       <svg width={timeLineWidth + LEFT_PADDING / 2} height={timeGridHeight + rowHeight}>
         {viewMode === 'days' && (
           <>

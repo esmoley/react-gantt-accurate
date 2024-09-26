@@ -17,6 +17,7 @@ export type TaskTooltipProps = {
   setTaskTooltipTaskX: React.Dispatch<React.SetStateAction<number>>
   setTaskTooltipTaskWidth: React.Dispatch<React.SetStateAction<number>>
   rowHeight: number
+  timeGridRef: React.MutableRefObject<HTMLDivElement>
 }
 export const TaskTooltip = ({
   top,
@@ -33,10 +34,14 @@ export const TaskTooltip = ({
   setTaskTooltipTaskX,
   setTaskTooltipTaskWidth,
   rowHeight,
+  timeGridRef,
 }: TaskTooltipProps) => {
   const tooltipChildRef = useRef<HTMLDivElement>(null)
 
-  const taskEndX = taskX + taskWidth
+  const windowWidthScrolled = window.scrollX + window.innerWidth
+  const timeGridScrollX = timeGridRef.current?.scrollLeft ?? 0
+
+  const taskEndX = taskX + taskWidth - timeGridScrollX
   const tooltipRightToTaskX = SCREEN_PADDING + taskEndX
   const [left, setLeft] = useState<React.CSSProperties['left']>(tooltipRightToTaskX)
   const [right, setRight] = useState<React.CSSProperties['right']>(null)
@@ -44,7 +49,6 @@ export const TaskTooltip = ({
   const [innerRight, setInnerRight] = useState<React.CSSProperties['left']>(null)
   const [topUpdated, setTopUpdated] = useState<React.CSSProperties['top']>(top)
   const [step, setStep] = useState<'Initial' | 'UpdateOrientation' | 'SetTop' | 'SetBottom' | 'Done'>('Initial')
-  const windowWidthScrolled = window.scrollX + window.innerWidth
 
   // reset
   useEffect(() => {

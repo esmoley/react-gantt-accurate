@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useRef, useState } from 'react'
 import {
   calcViewMode,
   getCellMs,
@@ -42,7 +42,7 @@ export const Gantt = ({
   const [taskTooltipTaskWidth, setTaskTooltipTaskWidth] = useState<number>(0)
   const [taskTooltipMouseOver, setTaskTooltipMouseOver] = useState<boolean>(false)
   const timePeriodHeight = rowHeight - 14
-
+  const timeGridRef = useRef<HTMLDivElement>(null)
   const taskGraphMap: Map<string, TaskGraph> = useMemo(
     () =>
       rows?.reduce((accRows, row, rowIndex) => {
@@ -172,6 +172,7 @@ export const Gantt = ({
               taskMinWidthAlign={taskMinWidthAlign}
               rowHeight={rowHeight}
               timePeriodHeight={timePeriodHeight}
+              timeGridRef={timeGridRef}
             />
           </>
         ) : (
@@ -193,6 +194,7 @@ export const Gantt = ({
         setTaskTooltipTaskX={setTaskTooltipTaskX}
         setTaskTooltipTaskWidth={setTaskTooltipTaskWidth}
         rowHeight={rowHeight}
+        timeGridRef={timeGridRef}
       />
     </div>
   )
