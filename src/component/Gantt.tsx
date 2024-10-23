@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
   calcViewMode,
   getCellMs,
@@ -11,6 +11,7 @@ import { DependencyTask, LocaleType, Row, TaskGraph, TaskMinWidthAlignType, View
 import './styles.css'
 import { TimeGrid } from './TimeGrid'
 import { TaskTooltip } from './TaskTooltip'
+import { CELL_WIDTH } from '../util/consts'
 
 type GanntProps = {
   rows?: Row[]
@@ -111,7 +112,22 @@ export const Gantt = ({
 
   const endDate = getEndDate(highestTaskEndDate, viewModeActual)
   const cellMs = getCellMs(viewModeActual)
-
+  useEffect(() => {
+    if (!timeGridRef.current) return null
+    const onResize = () => {
+      setViewModeActual(
+        calcViewMode(
+          lowestTaskStartTs,
+          highestTaskEndTs,
+          viewMode,
+          Math.floor(timeGridRef.current.getBoundingClientRect().width / CELL_WIDTH),
+        ),
+      )
+    }
+    onResize()
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [timeGridRef, lowestTaskStartTs, highestTaskEndTs, viewMode])
   return (
     <div className={`react-gantt-accurate ${theme}`} style={{ position: 'relative' }}>
       <div className='gantt-grid-container' style={{ gridTemplateColumns: `${namesPanelWidth}px 1fr` }}>

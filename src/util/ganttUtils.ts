@@ -165,12 +165,13 @@ export function calcViewMode(
   lowestTaskStartTs: number,
   highestTaskEndTs: number,
   viewMode: ViewModeType | 'auto',
+  adaptiveColumnsMax: number = ADAPTIVE_COLUMNS_MAX,
 ): ViewModeType {
   if (viewMode && viewMode !== 'auto') return viewMode
   const diffTs = highestTaskEndTs - lowestTaskStartTs
-  if (diffTs / MILLISECOND_MS < ADAPTIVE_COLUMNS_MAX) return 'milliseconds'
-  if (diffTs / SECOND_MS < ADAPTIVE_COLUMNS_MAX) return 'seconds'
-  if (diffTs / MINUTE_MS < ADAPTIVE_COLUMNS_MAX) return 'minutes'
-  if (diffTs / HOUR_MS < ADAPTIVE_COLUMNS_MAX) return 'hours'
+  if (diffTs / MILLISECOND_MS < adaptiveColumnsMax) return 'milliseconds'
+  if (diffTs / SECOND_MS < adaptiveColumnsMax) return 'seconds'
+  if (diffTs / MINUTE_MS < adaptiveColumnsMax) return 'minutes'
+  if (diffTs / HOUR_MS < adaptiveColumnsMax) return 'hours'
   return 'days'
 }
