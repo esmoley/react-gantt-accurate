@@ -10,7 +10,6 @@
   .gantt-grid-container {
     display: grid;
     background: white;
-    width: fit-content;
     min-width: 400px;
     min-height: 150px;
   }
