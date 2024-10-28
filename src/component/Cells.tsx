@@ -1,5 +1,5 @@
 import React from 'react'
-import { CELL_WIDTH, COLUMNS_MAX } from '../util/consts'
+import { COLUMNS_MAX } from '../util/consts'
 import { Row, ViewModeType } from '../util/types'
 import { getDayOfWeek } from '../util/ganttUtils'
 
@@ -11,8 +11,9 @@ type CellsProps = {
   cellMs: number
   viewMode: ViewModeType
   rowHeight: number
+  cellWidth: number
 }
-export const Cells = ({ rows, y, startDate, endDate, cellMs, viewMode, rowHeight }: CellsProps) => {
+export const Cells = ({ rows, y, startDate, endDate, cellMs, viewMode, rowHeight, cellWidth }: CellsProps) => {
   const res = []
   let currentCellMs = startDate.getTime()
   let curX = 0
@@ -25,7 +26,7 @@ export const Cells = ({ rows, y, startDate, endDate, cellMs, viewMode, rowHeight
           key={currentCellMs + '_' + i}
           x={curX}
           y={y + rowHeight * i}
-          width={CELL_WIDTH}
+          width={cellWidth}
           height={rowHeight}
           className={
             (viewMode === 'days' && getDayOfWeek(currentDate) === 'S') ||
@@ -37,7 +38,7 @@ export const Cells = ({ rows, y, startDate, endDate, cellMs, viewMode, rowHeight
         />
       )),
     )
-    curX += CELL_WIDTH
+    curX += cellWidth
     currentCellMs += cellMs
   }
   return <g>{res}</g>

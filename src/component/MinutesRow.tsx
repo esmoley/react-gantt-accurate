@@ -1,5 +1,5 @@
 import React from 'react'
-import { CELL_WIDTH, LEFT_PADDING, MINUTE_MS } from '../util/consts'
+import { LEFT_PADDING, MINUTE_MS } from '../util/consts'
 
 type MinutesRowProps = {
   y: number
@@ -7,8 +7,9 @@ type MinutesRowProps = {
   endDate: Date
   cellMs: number
   timeLineWidth: number
+  cellWidth: number
 }
-export const MinutesRow = ({ y, startDate, endDate, cellMs, timeLineWidth }: MinutesRowProps) => {
+export const MinutesRow = ({ y, startDate, endDate, cellMs, timeLineWidth, cellWidth }: MinutesRowProps) => {
   const res = []
   const minute = new Date(
     startDate.getFullYear(),
@@ -23,7 +24,7 @@ export const MinutesRow = ({ y, startDate, endDate, cellMs, timeLineWidth }: Min
 
   const minutesDiff = startDate.getTime() - minute.getTime()
   if (minutesDiff > 0) {
-    curX += ((MINUTE_MS - minutesDiff) / cellMs) * CELL_WIDTH
+    curX += ((MINUTE_MS - minutesDiff) / cellMs) * cellWidth
     minute.setMinutes(minute.getMinutes() + 1)
   }
   while (minute.getTime() < endDate.getTime() && curX < timeLineWidth) {
@@ -32,7 +33,7 @@ export const MinutesRow = ({ y, startDate, endDate, cellMs, timeLineWidth }: Min
         {minute.getMinutes()}
       </text>,
     )
-    curX += (MINUTE_MS / cellMs) * CELL_WIDTH
+    curX += (MINUTE_MS / cellMs) * cellWidth
     minute.setMinutes(minute.getMinutes() + 1)
   }
   return <g>{res}</g>

@@ -29,7 +29,7 @@ export const Gantt = ({
   locale = 'en',
   theme = 'light',
   viewMode = 'auto',
-  namesPanelWidth = 150,
+  namesPanelWidth = 170,
   namesPanelTextAlign = 'center',
   taskMinWidthAlign = 'start',
   rowHeight = 40,
@@ -111,6 +111,9 @@ export const Gantt = ({
   const startDate = getStartDate(lowestTaskStartDate, viewModeActual)
 
   const endDate = getEndDate(highestTaskEndDate, viewModeActual)
+  const [zoom, setZoom] = useState(1)
+  const cellWidth = CELL_WIDTH * zoom
+
   const cellMs = getCellMs(viewModeActual)
   useEffect(() => {
     if (!timeGridRef.current) return null
@@ -120,14 +123,15 @@ export const Gantt = ({
           lowestTaskStartTs,
           highestTaskEndTs,
           viewMode,
-          Math.floor(timeGridRef.current.getBoundingClientRect().width / CELL_WIDTH),
+          Math.floor(timeGridRef.current.getBoundingClientRect().width / cellWidth),
         ),
       )
     }
     onResize()
     window.addEventListener('resize', onResize)
     return () => window.removeEventListener('resize', onResize)
-  }, [timeGridRef, lowestTaskStartTs, highestTaskEndTs, viewMode])
+  }, [timeGridRef, lowestTaskStartTs, highestTaskEndTs, viewMode, cellWidth])
+
   return (
     <div className={`react-gantt-accurate ${theme}`} style={{ position: 'relative' }}>
       <div className='gantt-grid-container' style={{ gridTemplateColumns: `${namesPanelWidth}px 1fr` }}>
@@ -147,6 +151,36 @@ export const Gantt = ({
                     ))}
                   </select>
                 )}
+                <div style={{ whiteSpace: 'nowrap' }}>
+                  <button
+                    type='button'
+                    title='Zoom in'
+                    onClick={() => zoom * 2 < 10 && setZoom(zoom * 2)}
+                    className='gantt-button'
+                  >
+                    <svg viewBox='0 0 14 14' width='14px' height='14px'>
+                      <path d='M6 3.5c.28 0 .5.22.5.5v1.5H8a.5.5 0 0 1 0 1H6.5V8a.5.5 0 0 1-1 0V6.5H4a.5.5 0 0 1 0-1h1.5V4c0-.28.22-.5.5-.5Z'></path>
+                      <path
+                        fillRule='evenodd'
+                        d='M9.54 10.2a5.5 5.5 0 1 1 .66-.66c.06.03.11.06.15.1l3 3a.5.5 0 0 1-.7.71l-3-3a.5.5 0 0 1-.1-.14ZM10.5 6a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z'
+                      ></path>
+                    </svg>
+                  </button>
+                  <button
+                    type='button'
+                    title='Zoom out'
+                    onClick={() => zoom * 0.5 > 0.2 && setZoom(zoom * 0.5)}
+                    className='gantt-button'
+                  >
+                    <svg viewBox='0 0 14 14' width='14px' height='14px'>
+                      <path d='M4 5.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1H4Z'></path>
+                      <path
+                        fillRule='evenodd'
+                        d='M6 11.5c1.35 0 2.59-.49 3.54-1.3.03.06.06.11.1.15l3 3a.5.5 0 0 0 .71-.7l-3-3a.5.5 0 0 0-.14-.1A5.5 5.5 0 1 0 6 11.5Zm0-1a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Z'
+                      ></path>
+                    </svg>
+                  </button>
+                </div>
               </div>
               {rows.map((row, index) => (
                 <div key={index} className='gantt-task-row' style={{ height: `${rowHeight}px` }}>
@@ -189,6 +223,7 @@ export const Gantt = ({
               rowHeight={rowHeight}
               timePeriodHeight={timePeriodHeight}
               timeGridRef={timeGridRef}
+              cellWidth={cellWidth}
             />
           </>
         ) : (

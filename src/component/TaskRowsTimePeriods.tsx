@@ -20,6 +20,7 @@ type TaskRowsTimePeriodsProps = {
   taskMinWidthAlign: TaskMinWidthAlignType
   rowHeight: number
   timePeriodHeight: number
+  cellWidth: number
 }
 
 export const TaskRowsTimePeriods = ({
@@ -40,6 +41,7 @@ export const TaskRowsTimePeriods = ({
   taskMinWidthAlign,
   rowHeight,
   timePeriodHeight,
+  cellWidth,
 }: TaskRowsTimePeriodsProps) => {
   const [mouseOverTask, setMouseOverTask] = useState<TaskGraph>(null)
   useEffect(() => {
@@ -50,7 +52,7 @@ export const TaskRowsTimePeriods = ({
   return (
     <g>
       {taskGraphArr.map((t) => {
-        const { x, width } = getTaskGraphRowPos(t, startDate, cellMs, taskMinWidthAlign)
+        const { x, width } = getTaskGraphRowPos(t, startDate, cellMs, taskMinWidthAlign, cellWidth)
         const curY = y + t.rowIndex * rowHeight + 7
         return (
           <rect

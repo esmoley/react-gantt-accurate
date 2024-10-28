@@ -1,4 +1,4 @@
-import { CELL_WIDTH, MIN_TASK_WIDTH } from './consts'
+import { MIN_TASK_WIDTH } from './consts'
 import { TaskGraph, TaskGraphRowPos, TaskMinWidthAlignType } from './types'
 
 const MAX_SAFE_X = 1000000
@@ -7,10 +7,11 @@ export const getTaskGraphRowPos = (
   startDate: Date,
   cellMs: number,
   taskMinWidthAlign: TaskMinWidthAlignType,
+  cellWidth: number,
 ): TaskGraphRowPos => {
-  let x = ((t.start - startDate.getTime()) / cellMs) * CELL_WIDTH
+  let x = ((t.start - startDate.getTime()) / cellMs) * cellWidth
   if (x > MAX_SAFE_X) x = MAX_SAFE_X
-  let width = ((t.end - t.start) / cellMs) * CELL_WIDTH
+  let width = ((t.end - t.start) / cellMs) * cellWidth
   if (width < MIN_TASK_WIDTH) {
     if (taskMinWidthAlign === 'end') x -= MIN_TASK_WIDTH - width
     width = MIN_TASK_WIDTH

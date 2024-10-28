@@ -112,6 +112,12 @@
   option {
     text-shadow: none; 
   }
+  .gantt-button{
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    fill:#616161;
+  }
   &.dark{
     .gantt-grid-container{
       background: #1F1F1F;
@@ -145,6 +151,9 @@
       border: 1px solid #4e4e4e;
       color: #cfcfcf;
       text-shadow: 0 1px 0 #1F1F1F;
+    }
+    .gantt-button{
+      fill:#cfcfcf;
     }
   }
 }

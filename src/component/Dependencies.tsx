@@ -9,6 +9,7 @@ type DependenciesProps = {
   cellMs: number
   taskMinWidthAlign: TaskMinWidthAlignType
   rowHeight: number
+  cellWidth: number
 }
 export const Dependencies = ({
   y,
@@ -17,16 +18,23 @@ export const Dependencies = ({
   cellMs,
   taskMinWidthAlign,
   rowHeight,
+  cellWidth,
 }: DependenciesProps) => {
   return taskGraphArr.map((t) => {
     if (t.dependencies.length === 0) return null
     return t.dependencies.map((dependencyTask) => {
       const value = dependencyTask
-      const { x: taskStartX, width: taskWidth } = getTaskGraphRowPos(t, startDate, cellMs, taskMinWidthAlign)
+      const { x: taskStartX, width: taskWidth } = getTaskGraphRowPos(t, startDate, cellMs, taskMinWidthAlign, cellWidth)
       const taskEndX = taskStartX + taskWidth
       const taskY = y + t.rowIndex * rowHeight + rowHeight / 2
 
-      const { x: depStartX, width: depWidth } = getTaskGraphRowPos(value, startDate, cellMs, taskMinWidthAlign)
+      const { x: depStartX, width: depWidth } = getTaskGraphRowPos(
+        value,
+        startDate,
+        cellMs,
+        taskMinWidthAlign,
+        cellWidth,
+      )
       const depEndX = depStartX + depWidth
       const depY = y + value.rowIndex * rowHeight + rowHeight / 2
       const isTaskHigher = t.rowIndex < value.rowIndex

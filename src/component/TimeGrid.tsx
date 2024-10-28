@@ -1,5 +1,5 @@
 import React from 'react'
-import { CELL_WIDTH, COLUMNS_MAX, LEFT_PADDING } from '../util/consts'
+import { COLUMNS_MAX, LEFT_PADDING } from '../util/consts'
 import { LocaleType, Row, TaskGraph, TaskMinWidthAlignType, ViewModeType } from '../util/types'
 import { DaysRow } from './DaysRow'
 import { DaysOfTheWeekRow } from './DaysOfTheWeekRow'
@@ -35,6 +35,7 @@ type TimeGridProps = {
   rowHeight: number
   timePeriodHeight: number
   timeGridRef: React.MutableRefObject<HTMLDivElement>
+  cellWidth: number
 }
 export const TimeGrid = ({
   rows,
@@ -58,9 +59,10 @@ export const TimeGrid = ({
   rowHeight,
   timePeriodHeight,
   timeGridRef,
+  cellWidth,
 }: TimeGridProps) => {
   const columnsCount = Math.min(COLUMNS_MAX, (endDate.getTime() - startDate.getTime()) / cellMs)
-  const timeLineWidth = CELL_WIDTH * columnsCount
+  const timeLineWidth = cellWidth * columnsCount
   const timeGridHeight = rowHeight * rows.length + 10
   return (
     <div ref={timeGridRef} style={{ overflowX: 'auto' }}>
@@ -73,6 +75,7 @@ export const TimeGrid = ({
               endDate={endDate}
               cellMs={cellMs}
               timeLineWidth={timeLineWidth}
+              cellWidth={cellWidth}
             />
             <DaysOfTheWeekRow
               y={rowHeight}
@@ -81,6 +84,7 @@ export const TimeGrid = ({
               cellMs={cellMs}
               locale={locale}
               timeLineWidth={timeLineWidth}
+              cellWidth={cellWidth}
             />
           </>
         )}
@@ -92,6 +96,7 @@ export const TimeGrid = ({
               endDate={endDate}
               cellMs={cellMs}
               timeLineWidth={timeLineWidth}
+              cellWidth={cellWidth}
             />
             <HoursRow
               y={rowHeight}
@@ -99,6 +104,7 @@ export const TimeGrid = ({
               endDate={endDate}
               cellMs={cellMs}
               timeLineWidth={timeLineWidth}
+              cellWidth={cellWidth}
             />
           </>
         )}
@@ -110,6 +116,7 @@ export const TimeGrid = ({
               endDate={endDate}
               cellMs={cellMs}
               timeLineWidth={timeLineWidth}
+              cellWidth={cellWidth}
             />
             <MinutesRow
               y={rowHeight}
@@ -117,6 +124,7 @@ export const TimeGrid = ({
               endDate={endDate}
               cellMs={cellMs}
               timeLineWidth={timeLineWidth}
+              cellWidth={cellWidth}
             />
           </>
         )}
@@ -128,6 +136,7 @@ export const TimeGrid = ({
               endDate={endDate}
               cellMs={cellMs}
               timeLineWidth={timeLineWidth}
+              cellWidth={cellWidth}
             />
             <SecondsRow
               y={rowHeight}
@@ -135,6 +144,7 @@ export const TimeGrid = ({
               endDate={endDate}
               cellMs={cellMs}
               timeLineWidth={timeLineWidth}
+              cellWidth={cellWidth}
             />
           </>
         )}
@@ -146,6 +156,7 @@ export const TimeGrid = ({
               endDate={endDate}
               cellMs={cellMs}
               timeLineWidth={timeLineWidth}
+              cellWidth={cellWidth}
             />
             <MillisecondsRow
               y={rowHeight}
@@ -153,6 +164,7 @@ export const TimeGrid = ({
               endDate={endDate}
               cellMs={cellMs}
               timeLineWidth={timeLineWidth}
+              cellWidth={cellWidth}
             />
           </>
         )}
@@ -164,13 +176,14 @@ export const TimeGrid = ({
           viewMode={viewMode}
           rows={rows}
           rowHeight={rowHeight}
+          cellWidth={cellWidth}
         />
         <RowLines y={rowHeight + 10} amount={rows.length + 1} spaceY={rowHeight} width={timeLineWidth + LEFT_PADDING} />
         <ColumnLines
           x={0}
           y={rowHeight + 10}
           amount={columnsCount + 1}
-          spaceX={CELL_WIDTH}
+          spaceX={cellWidth}
           height={timeGridHeight + rowHeight}
         />
         <Dependencies
@@ -180,6 +193,7 @@ export const TimeGrid = ({
           cellMs={cellMs}
           taskMinWidthAlign={taskMinWidthAlign}
           rowHeight={rowHeight}
+          cellWidth={cellWidth}
         />
         <TaskRowsTimePeriods
           y={rowHeight + 10}
@@ -199,6 +213,7 @@ export const TimeGrid = ({
           taskMinWidthAlign={taskMinWidthAlign}
           rowHeight={rowHeight}
           timePeriodHeight={timePeriodHeight}
+          cellWidth={cellWidth}
         />
       </svg>
     </div>

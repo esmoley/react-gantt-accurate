@@ -1,5 +1,5 @@
 import React from 'react'
-import { CELL_WIDTH, HOUR_MS, LEFT_PADDING } from '../util/consts'
+import { HOUR_MS, LEFT_PADDING } from '../util/consts'
 
 type HoursRowProps = {
   y: number
@@ -7,9 +7,10 @@ type HoursRowProps = {
   endDate: Date
   cellMs: number
   timeLineWidth: number
+  cellWidth: number
 }
 
-export const HoursRow = ({ y, startDate, endDate, cellMs, timeLineWidth }: HoursRowProps) => {
+export const HoursRow = ({ y, startDate, endDate, cellMs, timeLineWidth, cellWidth }: HoursRowProps) => {
   const res = []
   const hour = new Date(
     startDate.getFullYear(),
@@ -24,7 +25,7 @@ export const HoursRow = ({ y, startDate, endDate, cellMs, timeLineWidth }: Hours
 
   const hoursDiff = startDate.getTime() - hour.getTime()
   if (hoursDiff > 0) {
-    curX += ((HOUR_MS - hoursDiff) / cellMs) * CELL_WIDTH
+    curX += ((HOUR_MS - hoursDiff) / cellMs) * cellWidth
     hour.setHours(hour.getHours() + 1)
   }
 
@@ -34,7 +35,7 @@ export const HoursRow = ({ y, startDate, endDate, cellMs, timeLineWidth }: Hours
         {hour.getHours()}
       </text>,
     )
-    curX += (HOUR_MS / cellMs) * CELL_WIDTH
+    curX += (HOUR_MS / cellMs) * cellWidth
     hour.setHours(hour.getHours() + 1)
   }
   return <g>{res}</g>

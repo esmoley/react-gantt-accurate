@@ -1,5 +1,5 @@
 import React from 'react'
-import { CELL_WIDTH, LEFT_PADDING, MILLISECOND_MS } from '../util/consts'
+import { LEFT_PADDING, MILLISECOND_MS } from '../util/consts'
 
 type MillisecondsRowProps = {
   y: number
@@ -7,8 +7,9 @@ type MillisecondsRowProps = {
   endDate: Date
   cellMs: number
   timeLineWidth: number
+  cellWidth: number
 }
-export const MillisecondsRow = ({ y, startDate, endDate, cellMs, timeLineWidth }: MillisecondsRowProps) => {
+export const MillisecondsRow = ({ y, startDate, endDate, cellMs, timeLineWidth, cellWidth }: MillisecondsRowProps) => {
   const millisecond = new Date(startDate)
   const res = []
   let curX = LEFT_PADDING
@@ -18,7 +19,7 @@ export const MillisecondsRow = ({ y, startDate, endDate, cellMs, timeLineWidth }
         {millisecond.getMilliseconds()}
       </text>,
     )
-    curX += (MILLISECOND_MS / cellMs) * CELL_WIDTH
+    curX += (MILLISECOND_MS / cellMs) * cellWidth
     millisecond.setMilliseconds(millisecond.getMilliseconds() + 1)
   }
   return <g>{res}</g>
