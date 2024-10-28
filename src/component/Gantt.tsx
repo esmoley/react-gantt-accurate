@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   calcViewMode,
   getCellMs,
@@ -105,32 +105,44 @@ export const Gantt = ({
   const lowestTaskStartDate = new Date(lowestTaskStartTs)
   const highestTaskEndDate = new Date(highestTaskEndTs)
 
-  const [viewModeActual, setViewModeActual] = useState<ViewModeType>(
-    calcViewMode(lowestTaskStartTs, highestTaskEndTs, viewMode),
-  )
-  const startDate = getStartDate(lowestTaskStartDate, viewModeActual)
-
-  const endDate = getEndDate(highestTaskEndDate, viewModeActual)
   const [zoom, setZoom] = useState(1)
   const cellWidth = CELL_WIDTH * zoom
 
+  const [viewModeActual, setViewModeActual] = useState<ViewModeType>(
+    calcViewMode(lowestTaskStartTs, highestTaskEndTs, viewMode),
+  )
+  const [loaded, setLoaded] = useState(false)
+
+  const onResize = useCallback(() => {
+    if (!timeGridRef.current) return null
+    setViewModeActual(
+      calcViewMode(
+        lowestTaskStartTs,
+        highestTaskEndTs,
+        viewMode,
+        Math.floor(timeGridRef.current.getBoundingClientRect().width / cellWidth),
+      ),
+    )
+  }, [timeGridRef, lowestTaskStartTs, highestTaskEndTs, cellWidth, viewMode])
+
+  const startDate = getStartDate(lowestTaskStartDate, viewModeActual)
+
+  const endDate = getEndDate(highestTaskEndDate, viewModeActual)
+
   const cellMs = getCellMs(viewModeActual)
+
   useEffect(() => {
     if (!timeGridRef.current) return null
-    const onResize = () => {
-      setViewModeActual(
-        calcViewMode(
-          lowestTaskStartTs,
-          highestTaskEndTs,
-          viewMode,
-          Math.floor(timeGridRef.current.getBoundingClientRect().width / cellWidth),
-        ),
-      )
-    }
-    onResize()
     window.addEventListener('resize', onResize)
     return () => window.removeEventListener('resize', onResize)
-  }, [timeGridRef, lowestTaskStartTs, highestTaskEndTs, viewMode, cellWidth])
+  }, [onResize])
+
+  useEffect(() => {
+    if (loaded) return
+    if (!timeGridRef.current) return
+    onResize()
+    setLoaded(true)
+  }, [loaded, onResize])
 
   return (
     <div className={`react-gantt-accurate ${theme}`} style={{ position: 'relative' }}>
