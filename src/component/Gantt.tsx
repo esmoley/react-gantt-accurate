@@ -109,7 +109,6 @@ export const Gantt = ({
 
   const [zoom, setZoom] = useState(1)
   const cellWidth = CELL_WIDTH * zoom
-  console.log(zoom)
   const [viewModeActual, setViewModeActual] = useState<ViewModeType>(
     calcViewMode(lowestTaskStartTs, highestTaskEndTs, viewMode),
   )
