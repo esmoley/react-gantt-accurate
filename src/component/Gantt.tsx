@@ -109,7 +109,7 @@ export const Gantt = ({
 
   const [zoom, setZoom] = useState(1)
   const cellWidth = CELL_WIDTH * zoom
-
+  console.log(zoom)
   const [viewModeActual, setViewModeActual] = useState<ViewModeType>(
     calcViewMode(lowestTaskStartTs, highestTaskEndTs, viewMode),
   )
@@ -202,9 +202,9 @@ export const Gantt = ({
                     <input
                       type='range'
                       min={1}
-                      max={10}
-                      value={zoom * 5}
-                      onChange={(v) => setZoom(parseInt(v.currentTarget.value) / 5)}
+                      max={1000}
+                      value={zoom * 500}
+                      onChange={(v) => setZoom(parseInt(v.currentTarget.value) / 500)}
                       className='gantt-slider'
                     />
                   </div>
