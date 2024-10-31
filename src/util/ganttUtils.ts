@@ -1,5 +1,6 @@
 import {
   ADAPTIVE_COLUMNS_MAX,
+  COLUMNS_MAX,
   DAY_MS,
   DaysOfWeekArrEn,
   DaysOfWeekArrRu,
@@ -174,4 +175,19 @@ export function calcViewMode(
   if (diffTs / MINUTE_MS < adaptiveColumnsMax) return 'minutes'
   if (diffTs / HOUR_MS < adaptiveColumnsMax) return 'hours'
   return 'days'
+}
+
+export function getColumnsCount(startDate: Date, endDate: Date, cellMs: number): number {
+  return Math.min(COLUMNS_MAX, (endDate.getTime() - startDate.getTime()) / cellMs)
+}
+export function getTimeLineWidth(cellWidth: number, columnsCount: number): number {
+  return cellWidth * columnsCount
+}
+const ZOOM_MIN = 0.002
+const ZOOM_MAX = 5
+
+export function clampZoom(zoom: number): number {
+  if (zoom < ZOOM_MIN) return ZOOM_MIN
+  if (zoom > ZOOM_MAX) return ZOOM_MAX
+  return zoom
 }

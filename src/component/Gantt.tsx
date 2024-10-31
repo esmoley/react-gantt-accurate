@@ -1,10 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   calcViewMode,
+  clampZoom,
   getCellMs,
+  getColumnsCount,
   getEndDate,
   getNoDataText,
   getStartDate,
+  getTimeLineWidth,
   getViewModeSelectOptions,
 } from '../util/ganttUtils'
 import { DependencyTask, LocaleType, Row, TaskGraph, TaskMinWidthAlignType, ViewModeType } from '../util/types'
@@ -114,23 +117,22 @@ export const Gantt = ({
   )
   const [loaded, setLoaded] = useState(false)
 
-  const onResize = useCallback(() => {
-    if (!timeGridRef.current) return null
-    setViewModeActual(
-      calcViewMode(
-        lowestTaskStartTs,
-        highestTaskEndTs,
-        viewMode,
-        Math.floor(timeGridRef.current.getBoundingClientRect().width / cellWidth),
-      ),
-    )
-  }, [timeGridRef, lowestTaskStartTs, highestTaskEndTs, cellWidth, viewMode])
-
   const startDate = getStartDate(lowestTaskStartDate, viewModeActual)
 
   const endDate = getEndDate(highestTaskEndDate, viewModeActual)
 
   const cellMs = getCellMs(viewModeActual)
+
+  const onResize = useCallback(() => {
+    if (!timeGridRef.current) return null
+    const timeGridWidth = timeGridRef.current.getBoundingClientRect().width
+    const vmActual = calcViewMode(lowestTaskStartTs, highestTaskEndTs, viewMode, Math.floor(timeGridWidth / cellWidth))
+    const columnsCount = getColumnsCount(startDate, endDate, getCellMs(vmActual))
+    const tlWidth = getTimeLineWidth(CELL_WIDTH, columnsCount)
+    const zoomUpdate = (timeGridWidth - 10) / tlWidth
+    setZoom(clampZoom(zoomUpdate))
+    setViewModeActual(vmActual)
+  }, [timeGridRef, lowestTaskStartTs, highestTaskEndTs, cellWidth, viewMode, endDate, startDate])
 
   useEffect(() => {
     if (!timeGridRef.current) return null
@@ -169,7 +171,7 @@ export const Gantt = ({
                     <button
                       type='button'
                       title='Zoom in'
-                      onClick={() => zoom * 2 < 10 && setZoom(zoom * 2)}
+                      onClick={() => zoom * 2 < 10 && setZoom(clampZoom(zoom * 2))}
                       className='gantt-button'
                     >
                       <svg viewBox='0 0 14 14' width='14px' height='14px'>
@@ -183,7 +185,7 @@ export const Gantt = ({
                     <button
                       type='button'
                       title='Zoom out'
-                      onClick={() => zoom * 0.5 > 0.2 && setZoom(zoom * 0.5)}
+                      onClick={() => zoom * 0.5 > 0.2 && setZoom(clampZoom(zoom * 0.5))}
                       className='gantt-button'
                     >
                       <svg viewBox='0 0 14 14' width='14px' height='14px'>
@@ -203,7 +205,7 @@ export const Gantt = ({
                       min={1}
                       max={1000}
                       value={zoom * 500}
-                      onChange={(v) => setZoom(parseInt(v.currentTarget.value) / 500)}
+                      onChange={(v) => setZoom(clampZoom(parseInt(v.currentTarget.value) / 500))}
                       className='gantt-slider'
                     />
                   </div>

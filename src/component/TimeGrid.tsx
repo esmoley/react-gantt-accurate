@@ -1,5 +1,5 @@
 import React from 'react'
-import { COLUMNS_MAX, LEFT_PADDING } from '../util/consts'
+import { LEFT_PADDING } from '../util/consts'
 import { LocaleType, Row, TaskGraph, TaskMinWidthAlignType, ViewModeType } from '../util/types'
 import { DaysRow } from './DaysRow'
 import { DaysOfTheWeekRow } from './DaysOfTheWeekRow'
@@ -12,6 +12,7 @@ import { RowLines } from './RowLines'
 import { ColumnLines } from './ColumnLines'
 import { Dependencies } from './Dependencies'
 import { TaskRowsTimePeriods } from './TaskRowsTimePeriods'
+import { getColumnsCount, getTimeLineWidth } from '../util/ganttUtils'
 
 type TimeGridProps = {
   rows: Row[]
@@ -61,8 +62,8 @@ export const TimeGrid = ({
   timeGridRef,
   cellWidth,
 }: TimeGridProps) => {
-  const columnsCount = Math.min(COLUMNS_MAX, (endDate.getTime() - startDate.getTime()) / cellMs)
-  const timeLineWidth = cellWidth * columnsCount
+  const columnsCount = getColumnsCount(startDate, endDate, cellMs)
+  const timeLineWidth = getTimeLineWidth(cellWidth, columnsCount)
   const timeGridHeight = rowHeight * rows.length + 10
   return (
     <div ref={timeGridRef} style={{ overflowX: 'auto' }}>
