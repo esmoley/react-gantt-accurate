@@ -209,3 +209,62 @@ export const AdaptiveViewMode = {
   args: { rows: 1 },
   argTypes: { rows: { control: { type: 'range', min: 1, max: 5, step: 1 } } },
 }
+
+export const DependencyOffset = {
+  render: () => {
+    const rows = [
+      {
+        name: '>> Task 1',
+        tasks: [
+          {
+            start: new Date('2024-07-16T10:46:47.955Z'),
+            end: new Date('2024-07-16T10:47:07.955Z'),
+            id: '1',
+            tooltip: '>> Task 1',
+            color: '#c6ffb3',
+          },
+        ],
+      },
+      {
+        name: '>> Task 2',
+        tasks: [
+          {
+            start: new Date('2024-07-16T10:46:47.955Z'),
+            end: new Date('2024-07-16T10:47:07.955Z'),
+            id: '3',
+            tooltip: '>> Task 2',
+            color: '#c6ffb3',
+          },
+        ],
+      },
+      {
+        name: '>> Task 3',
+        tasks: [
+          {
+            start: new Date('2024-07-16T10:46:47.955Z'),
+            end: new Date('2024-07-16T10:47:07.955Z'),
+            id: '4',
+            tooltip: '>> Task 3',
+            color: '#ff8533',
+          },
+        ],
+      },
+      {
+        name: '>> Task 4',
+        tasks: [
+          {
+            start: new Date('2024-07-16T10:46:47.955Z'),
+            end: new Date('2024-07-16T10:47:07.955Z'),
+            id: '5',
+            tooltip: '>> Task 4',
+            color: '#ff8533',
+            dependencies: ['1', '3'],
+          },
+        ],
+      },
+    ]
+    return <Gantt rows={rows} theme='light' viewMode='seconds' />
+  },
+  args: {},
+  argTypes: {},
+}

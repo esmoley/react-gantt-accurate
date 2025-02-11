@@ -20,6 +20,7 @@ export const Dependencies = ({
   rowHeight,
   cellWidth,
 }: DependenciesProps) => {
+  let depsOffset = 0
   return taskGraphArr.map((t) => {
     if (t.dependencies.length === 0) return null
     return t.dependencies.map((dependencyTask) => {
@@ -40,6 +41,8 @@ export const Dependencies = ({
       const isTaskHigher = t.rowIndex < value.rowIndex
       const isSameRow = t.rowIndex === value.rowIndex
       const onClick = dependencyTask.dependencyObj?.onClick
+      depsOffset += 3
+      if (depsOffset >= 15) depsOffset -= 14
       return (
         <g key={t.task.id} className={`arrow${onClick ? ' onclick' : ''}`} onClick={onClick}>
           <path
@@ -48,17 +51,17 @@ export const Dependencies = ({
             d={
               isSameRow
                 ? taskStartX > depEndX
-                  ? `M ${depEndX} ${depY} h ${taskStartX - depEndX}`
-                  : `M ${taskEndX} ${depY} h ${depStartX - taskEndX}`
+                  ? `M ${depEndX} ${depY} h ${taskStartX - depEndX + depsOffset}`
+                  : `M ${taskEndX} ${depY} h ${depStartX - taskEndX + depsOffset}`
                 : `M ${depEndX} ${depY} 
-              h 10
+              h ${10}
               ${
                 taskStartX - depEndX - 20 > 0
                   ? `h ${taskStartX - depEndX - 20} v ${isTaskHigher ? '-' : ''}${rowHeight / 2}`
-                  : `v ${isTaskHigher ? '-' : ''}${rowHeight / 2} h ${taskStartX - depEndX - 20}`
+                  : `v ${isTaskHigher ? '-' : ''}${rowHeight / 2} h ${taskStartX - depEndX - 20 - depsOffset}`
               }
               v ${rowHeight * (t.rowIndex - value.rowIndex) + ((isTaskHigher ? 1 : -1) * rowHeight) / 2}
-              h 10 `
+              h ${10 + depsOffset} `
             }
           />
           <polygon
